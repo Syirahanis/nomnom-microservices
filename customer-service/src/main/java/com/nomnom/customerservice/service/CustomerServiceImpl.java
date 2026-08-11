@@ -6,10 +6,13 @@ import com.nomnom.customerservice.dto.UpdateCustomerRequest;
 import com.nomnom.customerservice.entity.AccountStatus;
 import com.nomnom.customerservice.entity.Customer;
 import com.nomnom.customerservice.exception.DuplicateResourceException;
+import com.nomnom.customerservice.exception.ResourceNotFoundException;
 import com.nomnom.customerservice.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.nomnom.customerservice.exception.ResourceNotFoundException;
+import com.nomnom.customerservice.event.CustomerRegisteredEvent;
+import com.nomnom.customerservice.kafka.CustomerKafkaProducer;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +23,8 @@ import java.util.Optional;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final CustomerKafkaProducer customerKafkaProducer;
 
     @Override
     public CustomerResponse registerCustomer(RegisterCustomerRequest request) {
@@ -66,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setFullName(request.getFullName());
         customer.setEmail(request.getEmail());
         customer.setPhoneNumber(request.getPhoneNumber());
-        customer.setPasswordHash(request.getPassword());
+        customer.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         customer.setDateOfBirth(request.getDateOfBirth());
         customer.setDateRegistered(LocalDateTime.now());
         customer.setLastLogin(null);
@@ -77,6 +82,16 @@ public class CustomerServiceImpl implements CustomerService {
 
         // Save to database
         Customer savedCustomer = customerRepository.save(customer);
+
+        // Publish CustomerRegistered event
+        CustomerRegisteredEvent event = new CustomerRegisteredEvent(
+                savedCustomer.getCustomerCode(),
+                savedCustomer.getFullName(),
+                savedCustomer.getEmail(),
+                savedCustomer.getPhoneNumber()
+        );
+
+        customerKafkaProducer.publishCustomerRegistered(event);
 
         // Convert Customer to CustomerResponse
         CustomerResponse response = new CustomerResponse();

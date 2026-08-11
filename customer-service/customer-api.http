@@ -1,5 +1,90 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
+### ==========================================
+### CUSTOMER SERVICE - REST API 
+### ==========================================
 
-###
+### 1. Register Customer
+POST http://localhost:8080/customers
+Content-Type: application/json
+
+{
+  "fullName": "Aina Rahman",
+  "email": "aina.test@example.com",
+  "phoneNumber": "0123456789",
+  "password": "Test1234",
+  "dateOfBirth": "2005-05-15",
+  "address": {
+    "unitOrHouseNumber": "12A",
+    "street": "Jalan Example",
+    "city": "Shah Alam",
+    "state": "Selangor",
+    "postcode": "40150",
+    "country": "Malaysia"
+  }
+}
+
+
+### 2. Get All Customers
+GET http://localhost:8080/customers
+
+
+### 3. Get Customer by Customer Code
+### Replace CUSXXXXXXXXXXXX with the code returned from registration
+GET http://localhost:8080/customers/CUSXXXXXXXXXXXX
+
+
+### 4. Update Customer
+### Replace CUSXXXXXXXXXXXX with the registered customer's code
+PUT http://localhost:8080/customers/CUSXXXXXXXXXXXX
+Content-Type: application/json
+
+{
+  "fullName": "Aina Rahman Updated",
+  "email": "aina.updated@example.com",
+  "phoneNumber": "0123456789",
+  "dateOfBirth": "2005-05-15",
+  "address": {
+    "unitOrHouseNumber": "20B",
+    "street": "Jalan Updated",
+    "city": "Shah Alam",
+    "state": "Selangor",
+    "postcode": "40150",
+    "country": "Malaysia"
+  }
+}
+
+
+### 5. Get Updated Customer
+### Replace CUSXXXXXXXXXXXX with the registered customer's code
+GET http://localhost:8080/customers/CUSXXXXXXXXXXXX
+
+
+### 6. Delete Customer
+### Soft delete - record remains in database
+### Replace CUSXXXXXXXXXXXX with the registered customer's code
+DELETE http://localhost:8080/customers/CUSXXXXXXXXXXXX
+
+
+### 7. Verify Soft Delete
+### Customer should still exist with accountStatus = DELETED
+GET http://localhost:8080/customers/CUSXXXXXXXXXXXX
+
+
+### 8. Non-Existing Customer
+GET http://localhost:8080/customers/CUS999999999999
+
+
+### ==========================================
+### KAFKA DEMONSTRATION
+### ==========================================
+
+### 9. Register Customer - CustomerRegistered Event
+POST http://localhost:8080/customers
+Content-Type: application/json
+
+{
+  "fullName": "Kafka Demo Customer",
+  "email": "kafka.demo@example.com",
+  "phoneNumber": "0187654321",
+  "password": "Test1234",
+  "dateOfBirth": "2005-06-10"
+}
