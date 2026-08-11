@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NomNom | Customer</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
+    <header class="navbar">
+
+        <a href="#" class="logo" onclick="showPage('register'); return false;">
+            <span class="logo-dot"></span>
+            NomNom
+        </a>
+
+        <nav class="nav-links">
+            <a href="#" id="registerNav" class="active"
+               onclick="showPage('register'); return false;">
+                Register
+            </a>
+
+            <a href="#" id="profileNav"
+               onclick="showPage('profile'); return false;">
+                My Profile
+            </a>
+        </nav>
+
+    </header>
+
+
+    <!-- =========================
+         TOASTS
+    ========================== -->
+
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+
+    <!-- =========================
+         REGISTER PAGE
+    ========================== -->
+
+    <main id="registerPage" class="page active-page">
+
+        <section class="register-page">
+
+            <div class="register-container">
+
+                <div class="register-header">
+
+                    <p class="eyebrow">
+                        CUSTOMER ACCOUNT
+                    </p>
+
+                    <h1>
+                        Create your<br>
+                        <span>NomNom account.</span>
+                    </h1>
+
+                    <p class="page-description">
+                        Join NomNom and manage your food ordering account.
+                        Your details are saved straight to the Customer Service database.
+                    </p>
+
+                </div>
+
+
+                <!-- Registration Form -->
+
+                <form id="registerForm" class="register-card" novalidate>
+
+                    <div class="form-grid">
+
+                        <!-- Full Name -->
+
+                        <div class="form-group full-width">
+
+                            <label for="fullName">
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="fullName"
+                                name="fullName"
+                                placeholder="Enter your full name"
+                                required
+                            >
+                            <span class="field-error" id="err-fullName"></span>
+
+                        </div>
+
+
+                        <!-- Email -->
+
+                        <div class="form-group">
+
+                            <label for="email">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="you@example.com"
+                            >
+                            <span class="field-error" id="err-email"></span>
+
+                        </div>
+
+
+                        <!-- Phone -->
+
+                        <div class="form-group">
+
+                            <label for="phoneNumber">
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="phoneNumber"
+                                name="phoneNumber"
+                                placeholder="0123456789"
+                            >
+                            <span class="field-error" id="err-phoneNumber"></span>
+
+                        </div>
+
+
+                        <!-- Password -->
+
+                        <div class="form-group">
+
+                            <label for="password">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                required
+                            >
+                            <span class="field-error" id="err-password"></span>
+
+                        </div>
+
+
+                        <!-- Date of Birth -->
+
+                        <div class="form-group">
+
+                            <label for="dateOfBirth">
+                                Date of Birth
+                            </label>
+
+                            <input
+                                type="date"
+                                id="dateOfBirth"
+                                name="dateOfBirth"
+                                required
+                            >
+                            <span class="field-error" id="err-dateOfBirth"></span>
+
+                        </div>
+
+
+                        <!-- Address -->
+
+                        <div class="form-group full-width">
+                            <span class="address-legend">Address</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="unitOrHouseNumber">Unit / House No.</label>
+                            <input type="text" id="unitOrHouseNumber" name="unitOrHouseNumber"
+                                   placeholder="e.g. 12-3" required>
+                            <span class="field-error" id="err-unitOrHouseNumber"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="street">Street</label>
+                            <input type="text" id="street" name="street"
+                                   placeholder="e.g. Jalan Ampang" required>
+                            <span class="field-error" id="err-street"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postcode">Postcode</label>
+                            <input type="text" id="postcode" name="postcode"
+                                   placeholder="e.g. 50450" required>
+                            <span class="field-error" id="err-postcode"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city"
+                                   placeholder="e.g. Kuala Lumpur" required>
+                            <span class="field-error" id="err-city"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state"
+                                   placeholder="e.g. WP Kuala Lumpur" required>
+                            <span class="field-error" id="err-state"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <input type="text" id="country" name="country"
+                                   placeholder="e.g. Malaysia" required>
+                            <span class="field-error" id="err-country"></span>
+                        </div>
+
+
+                        <!-- Submit -->
+
+                        <div class="form-submit">
+
+                            <button
+                                type="submit"
+                                class="register-button"
+                                id="registerSubmitButton"
+                            >
+                                <span class="button-label">Create Account</span>
+                                <span class="button-arrow">→</span>
+                            </button>
+
+                            <p class="form-note">
+                                By creating an account, you agree to NomNom's
+                                terms and conditions.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         PROFILE PAGE
+    ========================== -->
+
+    <main id="profilePage" class="page">
+
+        <section class="profile-page">
+
+            <div class="profile-container">
+
+                <div class="profile-header">
+
+                    <p class="eyebrow">
+                        YOUR ACCOUNT
+                    </p>
+
+                    <h1>
+                        My Profile
+                    </h1>
+
+                    <p class="page-description">
+                        View and manage your NomNom customer information.
+                    </p>
+
+                </div>
+
+
+                <!-- Lookup bar: reload-safe access via customer code (Read) -->
+
+                <div class="lookup-toggle" id="lookupToggle">
+                    <a href="#" id="lookupToggleLink">Already have an account? Enter your customer code</a>
+                    <p class="action-hint lookup-hint">Look up your saved account using your customer code</p>
+                </div>
+
+                <div class="lookup-bar" id="lookupBar" hidden>
+
+                    <div class="lookup-field">
+                        <label for="lookupCode">Look up by customer code</label>
+                        <input
+                            type="text"
+                            id="lookupCode"
+                            placeholder="e.g. CUS1733999999999"
+                        >
+                    </div>
+
+                    <button type="button" class="secondary-button" id="lookupButton">
+                        Find Account
+                    </button>
+
+                </div>
+
+
+                <!-- Empty state -->
+
+                <div class="profile-empty" id="profileEmptyState">
+
+                    <p>No account loaded yet.</p>
+                    <p class="profile-empty-sub">
+                        Register a new account, or find an existing one above.
+                    </p>
+
+                </div>
+
+
+                <!-- Profile Card -->
+
+                <section class="profile-card" id="profileCard" hidden>
+
+                    <div class="profile-top">
+
+                        <div class="profile-avatar" id="profileAvatar">
+                            N
+                        </div>
+
+                        <div class="profile-main">
+
+                            <h2 id="profileName">
+                                Customer Name
+                            </h2>
+
+                            <p class="customer-code">
+                                Customer Code:
+                                <span id="profileCustomerCode">
+                                    —
+                                </span>
+                            </p>
+
+                        </div>
+
+                        <div class="status-badge" id="profileStatus">
+                            ACTIVE
+                        </div>
+
+                    </div>
+
+
+                    <!-- Profile Information (view mode) -->
+
+                    <div class="profile-details" id="profileViewDetails">
+
+                        <div class="profile-item">
+                            <span class="profile-label">EMAIL</span>
+                            <strong id="profileEmail">—</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <span class="profile-label">PHONE NUMBER</span>
+                            <strong id="profilePhone">—</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <span class="profile-label">LOYALTY POINTS</span>
+                            <strong id="profilePoints">0</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <span class="profile-label">DATE REGISTERED</span>
+                            <strong id="profileDate">—</strong>
+                        </div>
+
+                        <div class="profile-item full-profile-width">
+                            <span class="profile-label">ADDRESS</span>
+                            <strong id="profileAddress">—</strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Profile Information (edit mode) -->
+
+                    <form class="profile-details profile-edit-form" id="profileEditForm" hidden>
+
+                        <div class="form-group">
+                            <label for="editFullName">Full Name</label>
+                            <input type="text" id="editFullName" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editEmail">Email</label>
+                            <input type="email" id="editEmail">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editPhoneNumber">Phone Number</label>
+                            <input type="tel" id="editPhoneNumber">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editDateOfBirth">Date of Birth</label>
+                            <input type="date" id="editDateOfBirth">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editUnitOrHouseNumber">Unit / House No.</label>
+                            <input type="text" id="editUnitOrHouseNumber">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editStreet">Street</label>
+                            <input type="text" id="editStreet">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editPostcode">Postcode</label>
+                            <input type="text" id="editPostcode">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editCity">City</label>
+                            <input type="text" id="editCity">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editState">State</label>
+                            <input type="text" id="editState">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editCountry">Country</label>
+                            <input type="text" id="editCountry">
+                        </div>
+
+                        <div class="form-group full-profile-width edit-actions">
+                            <button type="submit" class="register-button" id="saveProfileButton">
+                                <span class="button-label">Save Changes</span>
+                            </button>
+                            <button type="button" class="secondary-button" id="cancelEditButton">
+                                Cancel
+                            </button>
+                        </div>
+
+                    </form>
+
+
+                    <!-- Profile Actions -->
+
+                    <div class="profile-actions-header">
+                        <span class="profile-actions-label">Manage this account</span>
+                    </div>
+
+                    <div class="profile-actions">
+
+                        <div class="action-item">
+                            <button class="secondary-button" id="editButton">
+                                Edit Profile
+                            </button>
+                            <p class="action-hint">Update your name, contact info, or address</p>
+                        </div>
+
+                        <div class="action-item">
+                            <button class="secondary-button" onclick="showPage('register')">
+                                Register Another Account
+                            </button>
+                            <p class="action-hint">Create a new NomNom account</p>
+                        </div>
+
+                        <div class="action-item">
+                            <button class="danger-button" id="deleteButton">
+                                Delete Account
+                            </button>
+                            <p class="action-hint">Permanently deactivate this account</p>
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- Customer Service Information -->
+
+                <div class="customer-service-note">
+
+                    <div class="note-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Customer Service
+                        </h3>
+
+                        <p>
+                            Your customer information is managed through
+                            the NomNom Customer Service, backed by the H2 database.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="footer">
+
+        <div class="footer-inner">
+
+            <div class="footer-logo">
+                <span class="logo-dot"></span>
+                NomNom
+            </div>
+
+            <p>
+                © 2026 NomNom. Customer Service.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script src="script.js"></script>
+
+</body>
+</html>
