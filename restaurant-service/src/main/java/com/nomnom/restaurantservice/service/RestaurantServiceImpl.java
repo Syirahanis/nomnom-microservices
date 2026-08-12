@@ -251,11 +251,13 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     private String generateRestaurantCode() {
-        return "RST" + System.currentTimeMillis();
+        long rCount = restaurantRepository.count() + 1;
+        return String.format("RST%03d", rCount);
     }
 
     private String generateMenuItemCode() {
-        return "ITM" + System.currentTimeMillis();
+        long iCount = menuItemRepository.count() + 1;
+        return String.format("ITM%03d", iCount);
     }
 
     private RestaurantResponse toRestaurantResponse(Restaurant restaurant) {

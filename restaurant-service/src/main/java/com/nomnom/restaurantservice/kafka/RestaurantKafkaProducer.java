@@ -15,7 +15,6 @@ public class RestaurantKafkaProducer {
     private static final String TOPIC_RESTAURANT_REGISTERED = "restaurant.registered";
     private static final String TOPIC_ORDER_CONFIRMED = "order.confirmed";
 
-    // Published when a new restaurant signs up
     public void publishRestaurantRegistered(RestaurantRegisteredEvent event) {
         kafkaTemplate.send(
                 TOPIC_RESTAURANT_REGISTERED,
@@ -24,7 +23,6 @@ public class RestaurantKafkaProducer {
         );
     }
 
-    // Published after Restaurant Service validates the order and confirms it
     public void publishOrderConfirmed(OrderConfirmedEvent event) {
         kafkaTemplate.send(
                 TOPIC_ORDER_CONFIRMED,

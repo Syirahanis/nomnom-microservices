@@ -30,7 +30,6 @@ public class RestaurantKafkaConsumer {
 
         System.out.println("Received OrderPlaced event: " + event);
 
-        // Find the restaurant this order belongs to
         var restaurantOpt = restaurantRepository.findByRestaurantCode(event.getRestaurantCode());
 
         if (restaurantOpt.isEmpty()) {
@@ -49,8 +48,6 @@ public class RestaurantKafkaConsumer {
         }
 
         var restaurant = restaurantOpt.get();
-
-        // Validate that every ordered item is available in this restaurant's menu
         boolean allItemsAvailable = true;
 
         if (event.getItems() != null) {
@@ -68,7 +65,7 @@ public class RestaurantKafkaConsumer {
         }
 
         if (!allItemsAvailable) {
-            System.out.println("Order " + event.getOrderCode() + " was NOT confirmed (item unavailable).");
+            System.out.println("Order " + event.getOrderCode() + " NOT confirmed (item unavailable).");
 
             restaurantKafkaProducer.publishOrderConfirmed(new OrderConfirmedEvent(
                     event.getOrderCode(),
@@ -81,7 +78,6 @@ public class RestaurantKafkaConsumer {
             return;
         }
 
-        // All items are available — confirm the order
         OrderConfirmedEvent confirmedEvent = new OrderConfirmedEvent(
                 event.getOrderCode(),
                 restaurant.getRestaurantCode(),
