@@ -1,0 +1,85 @@
+### ==========================================
+### ORDER SERVICE - REST API
+### ==========================================
+### Register a customer first (Customer Service, port 8080) and use its
+### customerCode below - Order Service will reject an unknown customer.
+
+### 1. Place an order (subtotal < RM100 -> RM5 delivery fee applies)
+POST http://localhost:8081/orders
+Content-Type: application/json
+
+{
+  "customerCode": "CUSXXXXXXXXXXXX",
+  "restaurantCode": "REST001",
+  "deliveryAddress": "12A, Jalan Example, 40150 Shah Alam, Selangor",
+  "items": [
+    { "menuItemCode": "MENU-NASI-LEMAK", "itemName": "Nasi Lemak Ayam", "quantity": 2, "unitPrice": 12.50 },
+    { "menuItemCode": "MENU-TEH-O", "itemName": "Teh O Ais", "quantity": 2, "unitPrice": 3.00 }
+  ]
+}
+
+
+### 2. Place an order that qualifies for free delivery (subtotal >= RM100)
+POST http://localhost:8081/orders
+Content-Type: application/json
+
+{
+  "customerCode": "CUSXXXXXXXXXXXX",
+  "restaurantCode": "REST001",
+  "deliveryAddress": "12A, Jalan Example, 40150 Shah Alam, Selangor",
+  "items": [
+    { "menuItemCode": "MENU-SET-A", "itemName": "Family Feast Set", "quantity": 4, "unitPrice": 30.00 }
+  ]
+}
+
+
+### 3. Get all orders
+GET http://localhost:8081/orders
+
+
+### 4. Get order by order code
+### Replace ORDXXXXXXXXXXXXX with the code returned from placing an order
+GET http://localhost:8081/orders/ORDXXXXXXXXXXXXX
+
+
+### 5. Get all orders for a customer
+GET http://localhost:8081/orders/customer/CUSXXXXXXXXXXXX
+
+
+### 6. Cancel an order (only works while status is still PLACED)
+### Replace ORDXXXXXXXXXXXXX with the code returned from placing an order
+PUT http://localhost:8081/orders/ORDXXXXXXXXXXXXX/cancel
+
+
+### 7. Placing an order for a customer that does not exist -> 400 Bad Request
+POST http://localhost:8081/orders
+Content-Type: application/json
+
+{
+  "customerCode": "CUS_DOES_NOT_EXIST",
+  "restaurantCode": "REST001",
+  "deliveryAddress": "Nowhere",
+  "items": [
+    { "menuItemCode": "MENU-NASI-LEMAK", "itemName": "Nasi Lemak Ayam", "quantity": 1, "unitPrice": 12.50 }
+  ]
+}
+
+
+### ==========================================
+### KAFKA DEMONSTRATION
+### ==========================================
+### Order Service publishes "order.placed" whenever step 1/2/8 above
+### succeeds - watch the console log or http://localhost:8085 (Kafka UI,
+### if the customer-service docker-compose port is used) to see it land.
+###
+### To see the consumer side working before the Restaurant & Catalog and
+### Delivery services exist, publish a fake event manually from a Kafka
+### console producer (adjust to your Kafka image's CLI path):
+###
+###   docker exec -it nomnom-kafka /opt/kafka/bin/kafka-console-producer.sh \
+###     --topic order.confirmed --broker-list localhost:9092
+###
+### then paste (single line):
+###   {"orderId":"ORDXXXXXXXXXXXXX","restaurantCode":"REST001","status":"CONFIRMED"}
+###
+### GET the order afterwards - status should now show CONFIRMED.
