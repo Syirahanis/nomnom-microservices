@@ -1556,3 +1556,47 @@ body {
 
     text-align: center;
 }
+
+
+/* ============================================================
+   RESTAURANT SERVICE — input text colour fix
+   The shared .lookup-field input uses white text (designed for
+   the dark profile card). Override it for the lighter restaurant
+   pages so the typed text is readable.
+   ============================================================ */
+
+#rstLookupBar .lookup-field input,
+#rstManageLookupBar .lookup-field input {
+    color: var(--green);
+    background: #f4f7f5;
+    border-color: #c8d8d2;
+}
+
+#rstLookupBar .lookup-field input::placeholder,
+#rstManageLookupBar .lookup-field input::placeholder {
+    color: #8fa89f;
+}
+
+#rstLookupBar .lookup-field label,
+#rstManageLookupBar .lookup-field label {
+    color: #4a6b5e;
+}
+
+/* Restaurant Service — button text colour fix
+   The shared .secondary-button uses white text.
+   Override for the restaurant pages so they are readable. */
+
+#rstLoadAllButton,
+#rstLookupButton,
+#rstManageLoadButton {
+    color: var(--green);
+    background: transparent;
+    border: 2px solid var(--green);
+}
+
+#rstLoadAllButton:hover,
+#rstLookupButton:hover,
+#rstManageLoadButton:hover {
+    background: var(--green);
+    color: var(--white);
+}

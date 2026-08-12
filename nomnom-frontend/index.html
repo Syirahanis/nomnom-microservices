@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>NomNom | Customer</title>
+    <title>NomNom | Food Delivery Platform</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -32,6 +32,19 @@
                onclick="showPage('profile'); return false;">
                 My Profile
             </a>
+
+            <!-- ===== RESTAURANT SERVICE NAV ===== -->
+            <a href="#" id="restaurantsNav"
+               onclick="showPage('restaurants'); return false;">
+                Restaurants
+            </a>
+
+            <a href="#" id="addRestaurantNav"
+               onclick="showPage('addRestaurant'); return false;">
+                Add Restaurant
+            </a>
+            <!-- ===== END RESTAURANT SERVICE NAV ===== -->
+
         </nav>
 
     </header>
@@ -514,6 +527,237 @@
     </main>
 
 
+    <!-- =============================================================
+         RESTAURANT SERVICE — BROWSE RESTAURANTS PAGE
+         Added by Student 2 (Restaurant & Catalog Service)
+         API: http://localhost:8081/restaurants
+    ============================================================== -->
+
+    <main id="restaurantsPage" class="page">
+
+        <section class="register-page">
+            <div class="register-container">
+
+                <div class="register-header">
+                    <p class="eyebrow">RESTAURANT & CATALOG SERVICE</p>
+                    <h1>Browse<br><span>Restaurants.</span></h1>
+                    <p class="page-description">
+                        All registered restaurants on the NomNom platform.
+                        Data is served live from the Restaurant Service (port 8081).
+                    </p>
+                </div>
+
+                <!-- Lookup bar -->
+                <div class="lookup-bar" id="rstLookupBar" style="margin-bottom: 1.5rem;">
+                    <div class="lookup-field">
+                        <label for="rstLookupCode">Look up by restaurant code</label>
+                        <input type="text" id="rstLookupCode" placeholder="e.g. RST1733999999999">
+                    </div>
+                    <button type="button" class="secondary-button" id="rstLookupButton">Find Restaurant</button>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <button type="button" class="secondary-button" id="rstLoadAllButton">Load All Restaurants</button>
+                </div>
+
+                <!-- Restaurant list -->
+                <div id="rstListContainer">
+                    <p style="color: var(--color-text-muted, #888);">Click "Load All Restaurants" to see the full list.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- =============================================================
+         RESTAURANT SERVICE — ADD / MANAGE RESTAURANT PAGE
+         Added by Student 2 (Restaurant & Catalog Service)
+    ============================================================== -->
+
+    <main id="addRestaurantPage" class="page">
+
+        <section class="register-page">
+            <div class="register-container">
+
+                <div class="register-header">
+                    <p class="eyebrow">RESTAURANT & CATALOG SERVICE</p>
+                    <h1>Manage<br><span>Your Restaurant.</span></h1>
+                    <p class="page-description">
+                        Register your restaurant and manage your menu.
+                        Each restaurant owns its own H2 database slice in the Restaurant Service.
+                    </p>
+                </div>
+
+                <!-- Register Restaurant Form -->
+                <form id="rstRegisterForm" class="register-card" novalidate>
+
+                    <div class="form-grid">
+
+                        <div class="form-group full-width">
+                            <span class="address-legend">Restaurant Details</span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="rstName">Restaurant Name</label>
+                            <input type="text" id="rstName" placeholder="e.g. Nasi Lemak Corner" required>
+                            <span class="field-error" id="rst-err-name"></span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="rstDescription">Description</label>
+                            <input type="text" id="rstDescription" placeholder="Short description of your restaurant">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstCuisine">Cuisine Type</label>
+                            <input type="text" id="rstCuisine" placeholder="e.g. Malaysian, Chinese, Western">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstOwnerName">Owner Name</label>
+                            <input type="text" id="rstOwnerName" placeholder="Full name of owner" required>
+                            <span class="field-error" id="rst-err-ownerName"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstContactPhone">Contact Phone</label>
+                            <input type="tel" id="rstContactPhone" placeholder="e.g. 0123456789" required>
+                            <span class="field-error" id="rst-err-contactPhone"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstContactEmail">Contact Email</label>
+                            <input type="email" id="rstContactEmail" placeholder="restaurant@example.com">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="rstOpeningHours">Opening Hours</label>
+                            <input type="text" id="rstOpeningHours" placeholder="e.g. Mon-Sun 10:00-22:00">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <span class="address-legend">Restaurant Address</span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="rstStreet">Street</label>
+                            <input type="text" id="rstStreet" placeholder="e.g. Jalan Ampang" required>
+                            <span class="field-error" id="rst-err-address.street"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstPostcode">Postcode</label>
+                            <input type="text" id="rstPostcode" placeholder="e.g. 50450" required>
+                            <span class="field-error" id="rst-err-address.postcode"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstCity">City</label>
+                            <input type="text" id="rstCity" placeholder="e.g. Kuala Lumpur" required>
+                            <span class="field-error" id="rst-err-address.city"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstState">State</label>
+                            <input type="text" id="rstState" placeholder="e.g. WP Kuala Lumpur" required>
+                            <span class="field-error" id="rst-err-address.state"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rstCountry">Country</label>
+                            <input type="text" id="rstCountry" placeholder="e.g. Malaysia" required>
+                            <span class="field-error" id="rst-err-address.country"></span>
+                        </div>
+
+                        <div class="form-submit">
+                            <button type="submit" class="register-button" id="rstRegisterButton">
+                                <span class="button-label">Register Restaurant</span>
+                                <span class="button-arrow">→</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </form>
+
+
+                <!-- ---- Menu Management (shown after a restaurant is loaded) ---- -->
+
+                <div id="rstMenuSection" hidden style="margin-top: 2.5rem;">
+
+                    <div class="profile-actions-header">
+                        <span class="profile-actions-label" id="rstMenuSectionTitle">Menu Items</span>
+                    </div>
+
+                    <!-- Add menu item form -->
+                    <form id="rstAddMenuItemForm" class="register-card" novalidate style="margin-top: 1rem;">
+
+                        <div class="form-grid">
+
+                            <div class="form-group full-width">
+                                <span class="address-legend">Add Menu Item</span>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="menuItemName">Item Name</label>
+                                <input type="text" id="menuItemName" placeholder="e.g. Nasi Lemak Special" required>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="menuItemDescription">Description</label>
+                                <input type="text" id="menuItemDescription" placeholder="Short description">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="menuItemPrice">Price (MYR)</label>
+                                <input type="number" id="menuItemPrice" placeholder="e.g. 12.90" step="0.01" min="0.01" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="menuItemCategory">Category</label>
+                                <input type="text" id="menuItemCategory" placeholder="e.g. Main Course, Drinks">
+                            </div>
+
+                            <div class="form-submit">
+                                <button type="submit" class="register-button" id="rstAddMenuItemButton">
+                                    <span class="button-label">Add to Menu</span>
+                                    <span class="button-arrow">→</span>
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                    <!-- Existing menu items list -->
+                    <div id="rstMenuItemsList" style="margin-top: 1.5rem;"></div>
+
+                </div>
+
+
+                <!-- Lookup existing restaurant for menu management -->
+                <div class="lookup-toggle" id="rstManageLookupToggle" style="margin-top: 2rem;">
+                    <a href="#" id="rstManageLookupLink">Already registered? Enter your restaurant code to manage</a>
+                </div>
+
+                <div id="rstManageLookupBar" hidden style="margin-top: 1rem; display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="lookup-field">
+                        <label for="rstManageCode">Restaurant Code</label>
+                        <input type="text" id="rstManageCode" placeholder="e.g. RST1733999999999">
+                    </div>
+                    <button type="button" class="secondary-button" id="rstManageLoadButton">Load Restaurant</button>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== END RESTAURANT SERVICE PAGES ===== -->
+
+
     <!-- =========================
          FOOTER
     ========================== -->
@@ -528,7 +772,7 @@
             </div>
 
             <p>
-                © 2026 NomNom. Customer Service.
+                © 2026 NomNom. Customer &amp; Restaurant Services.
             </p>
 
         </div>
