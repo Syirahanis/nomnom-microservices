@@ -743,7 +743,7 @@ function renderRestaurantList(restaurants, container) {
                 ${r.menuItems.map(item => `
                     <div class="profile-item">
                         <span class="profile-label">${escapeHtml(item.category || "ITEM")}</span>
-                        <strong>${escapeHtml(item.name)} — RM ${parseFloat(item.price).toFixed(2)}
+                        <strong>${escapeHtml(item.menuItemCode || "—")} - ${escapeHtml(item.name)} — RM ${parseFloat(item.price).toFixed(2)}
                             ${item.available ? "" : " <em style='color:#e55;'>(unavailable)</em>"}
                         </strong>
                     </div>
