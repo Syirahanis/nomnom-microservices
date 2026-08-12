@@ -19,7 +19,7 @@ public class DeliveryKafkaProducer {
     public void publishDeliveryAssigned(DeliveryAssignedEvent event) {
         kafkaTemplate.send(
                 TOPIC_DELIVERY_ASSIGNED,
-                event.getOrderId(),
+                event.getOrderCode(),
                 event
         );
     }
@@ -28,7 +28,7 @@ public class DeliveryKafkaProducer {
     public void publishOrderDelivered(OrderDeliveredEvent event) {
         kafkaTemplate.send(
                 TOPIC_ORDER_DELIVERED,
-                event.getOrderId(),
+                event.getOrderCode(),
                 event
         );
     }

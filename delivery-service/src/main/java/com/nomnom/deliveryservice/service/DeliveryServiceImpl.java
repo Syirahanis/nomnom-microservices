@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,16 +36,16 @@ public class DeliveryServiceImpl implements DeliveryService {
         // are ignored (the order was not accepted by the restaurant).
         if (!"CONFIRMED".equalsIgnoreCase(event.getStatus())) {
             System.out.println(
-                    "Ignoring OrderConfirmed for " + event.getOrderId()
+                    "Ignoring OrderConfirmed for " + event.getOrderCode()
                             + " - status is " + event.getStatus());
             return;
         }
 
         // if a delivery already exists for this order,
         // do not assign a second rider.
-        if (deliveryRepository.findByOrderId(event.getOrderId()).isPresent()) {
+        if (deliveryRepository.findByOrderId(event.getOrderCode()).isPresent()) {
             System.out.println(
-                    "Ignoring OrderConfirmed for " + event.getOrderId()
+                    "Ignoring OrderConfirmed for " + event.getOrderCode()
                             + " - a delivery already exists.");
             return;
         }
@@ -57,7 +56,8 @@ public class DeliveryServiceImpl implements DeliveryService {
         // save delivery to local .db
         Delivery delivery = Delivery.assign(
                 generateDeliveryCode(),
-                event.getOrderId(),
+                event.getOrderCode(),
+                event.getCustomerCode(),
                 rider.getRiderCode(),
                 resolveDeliveryAddress(event));
 
@@ -68,12 +68,12 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         System.out.println(
                 "Assigned rider " + rider.getRiderCode()
-                        + " to order " + event.getOrderId()
+                        + " to order " + event.getOrderCode()
                         + " (delivery " + saved.getDeliveryCode() + ")");
     }
 
     private String resolveDeliveryAddress(OrderConfirmedEvent event) {
-        return "Address on file for order " + event.getOrderId();
+        return "Address on file for order " + event.getOrderCode();
     }
 
     private String generateDeliveryCode() {
@@ -161,13 +161,14 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         OrderDeliveredEvent event = new OrderDeliveredEvent(
                 delivery.getOrderId(),
-                null,
+                delivery.getCustomerCode(),
                 "DELIVERED");
 
         deliveryKafkaProducer.publishOrderDelivered(event);
 
         System.out.println(
-                "Published OrderDelivered for order " + delivery.getOrderId());
+                "Published OrderDelivered for order " + delivery.getOrderId()
+                        + " (customer " + delivery.getCustomerCode() + ")");
     }
 
     private Delivery findDeliveryOrThrow(String deliveryCode) {

@@ -9,7 +9,7 @@ import java.util.List;
 // DDD Domain Event: OrderPlacedEvent
 // Published by Order Service to topic "order.placed".
 // Field names must match Order Service's OrderPlacedEvent exactly:
-//   - field is orderCode (not orderId)
+//   - field is orderCode (not orderCode)
 //   - inner class is OrderedLineItem with menuItemCode + quantity only
 @Data
 @NoArgsConstructor

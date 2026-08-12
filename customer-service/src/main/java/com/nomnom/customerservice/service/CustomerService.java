@@ -20,4 +20,13 @@ public interface CustomerService {
 
     void deleteCustomer(String customerCode);
 
+    /**
+     * Awards loyalty points to a customer after their order has been
+     * delivered. Invoked by CustomerKafkaConsumer when an
+     * "order.delivered" event arrives - points are only ever credited on
+     * completed delivery, never on order placement, so a cancelled order
+     * never earns points.
+     */
+    void awardLoyaltyPoints(String customerCode, int points);
+
 }

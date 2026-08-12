@@ -26,6 +26,9 @@ public class Delivery {
     private String orderId;
 
     @Column(nullable = false)
+    private String customerCode;
+
+    @Column(nullable = false)
     private String riderId;
 
     @Enumerated(EnumType.STRING)
@@ -41,17 +44,18 @@ public class Delivery {
 
     private LocalDateTime deliveredAt;
 
-    private Delivery(String deliveryCode, String orderId, String riderId, String deliveryAddress) {
+    private Delivery(String deliveryCode, String orderId, String customerCode, String riderId, String deliveryAddress) {
         this.deliveryCode = deliveryCode;
         this.orderId = orderId;
+        this.customerCode = customerCode;
         this.riderId = riderId;
         this.deliveryAddress = deliveryAddress;
         this.status = DeliveryStatus.ASSIGNED;
         this.assignedAt = LocalDateTime.now();
     }
 
-    public static Delivery assign(String deliveryCode, String orderId, String riderId, String deliveryAddress) {
-        return new Delivery(deliveryCode, orderId, riderId, deliveryAddress);
+    public static Delivery assign(String deliveryCode, String orderId, String customerCode, String riderId, String deliveryAddress) {
+        return new Delivery(deliveryCode, orderId, customerCode, riderId, deliveryAddress);
     }
 
     public void startTransit() {

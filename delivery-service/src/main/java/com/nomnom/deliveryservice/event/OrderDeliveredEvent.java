@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderDeliveredEvent {
 
-    private String orderId;
+    private String orderCode;
     private String customerCode;
     private String status;
 }

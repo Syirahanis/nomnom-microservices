@@ -32,7 +32,7 @@ public class DeliveryController {
     }
 
     // Get delivery by order id
-    @GetMapping("/order/{orderId}")
+    @GetMapping("/order/{orderCode}")
     public ResponseEntity<DeliveryResponse> getDeliveryByOrderId(
             @PathVariable String orderId) {
         return ResponseEntity.ok(deliveryService.getDeliveryByOrderId(orderId));

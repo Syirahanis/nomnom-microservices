@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * use in /api/deliveries/{id}/status
- */
 @Data
 public class DeliveryStatusResponse {
 

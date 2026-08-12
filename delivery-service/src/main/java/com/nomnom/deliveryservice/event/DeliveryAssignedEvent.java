@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class DeliveryAssignedEvent {
 
     private String deliveryCode;
-    private String orderId;
+    private String orderCode;
     private String riderId;
     private String deliveryAddress;
     private String assignedAt;

@@ -241,4 +241,34 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerRepository.save(customer);
     }
+
+    @Override
+    public void awardLoyaltyPoints(String customerCode, int points) {
+
+        if (points <= 0) {
+            System.out.println(
+                    "Ignoring loyalty point award for " + customerCode
+                            + " - points must be positive, got " + points);
+            return;
+        }
+
+        Optional<Customer> customerOpt = customerRepository.findByCustomerCode(customerCode);
+
+        if (customerOpt.isEmpty()) {
+            // Don't throw here - this is invoked from a Kafka listener with
+            // no caller to return an error to. Log and move on so a bad/
+            // unknown customerCode doesn't block the consumer.
+            System.out.println(
+                    "Ignoring loyalty point award - no customer found with code: " + customerCode);
+            return;
+        }
+
+        Customer customer = customerOpt.get();
+        customer.setLoyaltyPoints(customer.getLoyaltyPoints() + points);
+        customerRepository.save(customer);
+
+        System.out.println(
+                "Awarded " + points + " loyalty points to " + customerCode
+                        + " (new total: " + customer.getLoyaltyPoints() + ")");
+    }
 }
