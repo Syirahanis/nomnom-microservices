@@ -30,9 +30,9 @@ order-service/
 - CORS configured so a frontend can call the API directly.
 - Backend returns JSON error bodies (not plain text) for validation errors, unknown orders, invalid state transitions, and unreachable downstream services.
 
-To confirm it's working, visit `http://localhost:8081/orders` in a browser — you should see `[]` (or a list of orders).
+To confirm it's working, visit `http://localhost:8082/orders` in a browser — you should see `[]` (or a list of orders).
 
-H2 console (to inspect the database directly): `http://localhost:8081/h2-console`
+H2 console (to inspect the database directly): `http://localhost:8082/h2-console`
 - JDBC URL: `jdbc:h2:mem:nomnom_order`
 - Username: `sa`
 - Password: *(leave blank)*
@@ -43,7 +43,7 @@ H2 console (to inspect the database directly): `http://localhost:8081/h2-console
 
 1. Start Kafka: `docker compose up -d` (from the `nomnom-microservices` root — same Kafka container the other services share).
 2. Start Customer Service first: `cd customer-service && ./mvnw spring-boot:run` (port 8080). Order Service needs it reachable to validate customers.
-3. Start Order Service: `cd order-service && ./mvnw spring-boot:run` (port 8081).
+3. Start Order Service: `cd order-service && ./mvnw spring-boot:run` (port 8082).
 4. Register a customer via Customer Service, then use the returned `customerCode` in the requests below.
 
 ## Sample inputs (use cases)
@@ -55,9 +55,9 @@ curl -X POST http://localhost:8080/customers \
   -d '{"fullName":"Aina Rahman","email":"aina@example.com","phoneNumber":"0123456789","password":"Test1234"}'
 ```
 
-_(2) Place an order (Order Service, port 8081)_:
+_(2) Place an order (Order Service, port 8082)_:
 ```shell
-curl -X POST http://localhost:8081/orders \
+curl -X POST http://localhost:8082/orders \
   -H "Content-Type: application/json" \
   -d '{
     "customerCode": "CUSXXXXXXXXXXXX",
@@ -72,17 +72,17 @@ curl -X POST http://localhost:8081/orders \
 
 _(3) Get order by order code_:
 ```shell
-curl -X GET http://localhost:8081/orders/{orderCode}
+curl -X GET http://localhost:8082/orders/{orderCode}
 ```
 
 _(4) Get all orders for a customer_:
 ```shell
-curl -X GET http://localhost:8081/orders/customer/{customerCode}
+curl -X GET http://localhost:8082/orders/customer/{customerCode}
 ```
 
 _(5) Cancel an order (only while status is PLACED)_:
 ```shell
-curl -X PUT http://localhost:8081/orders/{orderCode}/cancel
+curl -X PUT http://localhost:8082/orders/{orderCode}/cancel
 ```
 
 _(6) Simulate the Restaurant & Catalog Service confirming an order (manual Kafka message, useful until that service exists)_:
@@ -97,8 +97,8 @@ then paste (single line) and press Enter:
 ```
 _(7) Confirm the status changed_:
 ```shell
-curl -X GET http://localhost:8081/orders/{orderCode}
-curl -X GET http://localhost:8081/orders/{ORD1786511183845}
+curl -X GET http://localhost:8082/orders/{orderCode}
+curl -X GET http://localhost:8082/orders/{ORD1786511183845}
 ```
 `status` should now read `"CONFIRMED"`.
 
@@ -125,4 +125,4 @@ curl -X GET http://localhost:8081/orders/{ORD1786511183845}
 - **"Could not reach Customer Service" / 503 response** → Customer Service isn't running on port 8080, or `customer-service.base-url` in `application.properties` doesn't match. Start Customer Service first.
 - **CORS error in browser console** → confirm `CorsConfig.java` exists and `SecurityConfig.java` has `.cors(Customizer.withDefaults())`, then restart the backend.
 - **Kafka listener not receiving events** → confirm the Kafka container is running (`docker compose ps`) and that the topic name in the producer matches exactly (`order.confirmed`, `order.delivered` — case-sensitive, dot-separated).
-- **`localhost:8081` shows a Whitelabel Error Page** → expected, there's no page mapped to `/`. Use `/orders` or the H2 console instead.
+- **`localhost:8082` shows a Whitelabel Error Page** → expected, there's no page mapped to `/`. Use `/orders` or the H2 console instead.

@@ -5,7 +5,7 @@
 ### customerCode below - Order Service will reject an unknown customer.
 
 ### 1. Place an order (subtotal < RM100 -> RM5 delivery fee applies)
-POST http://localhost:8081/orders
+POST http://localhost:8082/orders
 Content-Type: application/json
 
 {
@@ -20,7 +20,7 @@ Content-Type: application/json
 
 
 ### 2. Place an order that qualifies for free delivery (subtotal >= RM100)
-POST http://localhost:8081/orders
+POST http://localhost:8082/orders
 Content-Type: application/json
 
 {
@@ -34,25 +34,25 @@ Content-Type: application/json
 
 
 ### 3. Get all orders
-GET http://localhost:8081/orders
+GET http://localhost:8082/orders
 
 
 ### 4. Get order by order code
 ### Replace ORDXXXXXXXXXXXXX with the code returned from placing an order
-GET http://localhost:8081/orders/ORDXXXXXXXXXXXXX
+GET http://localhost:8082/orders/ORDXXXXXXXXXXXXX
 
 
 ### 5. Get all orders for a customer
-GET http://localhost:8081/orders/customer/CUSXXXXXXXXXXXX
+GET http://localhost:8082/orders/customer/CUSXXXXXXXXXXXX
 
 
 ### 6. Cancel an order (only works while status is still PLACED)
 ### Replace ORDXXXXXXXXXXXXX with the code returned from placing an order
-PUT http://localhost:8081/orders/ORDXXXXXXXXXXXXX/cancel
+PUT http://localhost:8082/orders/ORDXXXXXXXXXXXXX/cancel
 
 
 ### 7. Placing an order for a customer that does not exist -> 400 Bad Request
-POST http://localhost:8081/orders
+POST http://localhost:8082/orders
 Content-Type: application/json
 
 {
