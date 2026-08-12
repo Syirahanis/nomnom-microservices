@@ -28,7 +28,7 @@ public class RestaurantKafkaProducer {
     public void publishOrderConfirmed(OrderConfirmedEvent event) {
         kafkaTemplate.send(
                 TOPIC_ORDER_CONFIRMED,
-                event.getorderCode(),
+                event.getOrderCode(),
                 event
         );
     }

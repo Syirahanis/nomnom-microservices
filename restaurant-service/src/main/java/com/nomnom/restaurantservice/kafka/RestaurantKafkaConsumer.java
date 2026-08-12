@@ -34,11 +34,11 @@ public class RestaurantKafkaConsumer {
         var restaurantOpt = restaurantRepository.findByRestaurantCode(event.getRestaurantCode());
 
         if (restaurantOpt.isEmpty()) {
-            System.out.println("Restaurant not found for order: " + event.getorderCode()
+            System.out.println("Restaurant not found for order: " + event.getOrderCode()
                     + " — publishing REJECTED.");
 
             restaurantKafkaProducer.publishOrderConfirmed(new OrderConfirmedEvent(
-                    event.getorderCode(),
+                    event.getOrderCode(),
                     event.getRestaurantCode(),
                     "REJECTED",
                     null,
@@ -68,10 +68,10 @@ public class RestaurantKafkaConsumer {
         }
 
         if (!allItemsAvailable) {
-            System.out.println("Order " + event.getorderCode() + " was NOT confirmed (item unavailable).");
+            System.out.println("Order " + event.getOrderCode() + " was NOT confirmed (item unavailable).");
 
             restaurantKafkaProducer.publishOrderConfirmed(new OrderConfirmedEvent(
-                    event.getorderCode(),
+                    event.getOrderCode(),
                     restaurant.getRestaurantCode(),
                     "REJECTED",
                     restaurant.getName(),
@@ -83,7 +83,7 @@ public class RestaurantKafkaConsumer {
 
         // All items are available — confirm the order
         OrderConfirmedEvent confirmedEvent = new OrderConfirmedEvent(
-                event.getorderCode(),
+                event.getOrderCode(),
                 restaurant.getRestaurantCode(),
                 "CONFIRMED",
                 restaurant.getName(),
@@ -92,6 +92,6 @@ public class RestaurantKafkaConsumer {
         );
 
         restaurantKafkaProducer.publishOrderConfirmed(confirmedEvent);
-        System.out.println("Published OrderConfirmed event for order: " + event.getorderCode());
+        System.out.println("Published OrderConfirmed event for order: " + event.getOrderCode());
     }
 }
