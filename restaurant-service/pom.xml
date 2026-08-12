@@ -38,19 +38,19 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- REST API / Web -->
+        <!-- REST API / Web — same as customer-service and order-service -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
-        <!-- Kafka -->
+        <!-- Kafka — same as customer-service and order-service -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-kafka</artifactId>
         </dependency>
 
-        <!-- Spring Security -->
+        <!-- Spring Security — same as customer-service and order-service -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -63,7 +63,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- H2 Console -->
+        <!-- H2 Console — same as customer-service and order-service -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-h2console</artifactId>
@@ -76,7 +76,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Test Dependencies -->
+        <!-- Test Dependencies — same as customer-service and order-service -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa-test</artifactId>

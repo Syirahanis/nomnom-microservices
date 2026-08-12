@@ -8,24 +8,24 @@ import java.math.BigDecimal;
 import java.util.List;
 
 // DDD Domain Event: OrderPlacedEvent
-// Published by Order Service when a customer places an order.
-// Restaurant Service consumes this event to validate item availability
-// and then decides whether to confirm or reject the order.
+// Published by Order Service to topic "order.placed".
+// Field names must match Order Service's OrderPlacedEvent exactly —
+// orderId and OrderedLineItem are the names Order Service uses.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderPlacedEvent {
 
-    private String orderCode;
+    private String orderId;            // Order Service uses orderId, not orderCode
     private String customerCode;
     private String restaurantCode;
-    private List<OrderItemDetail> items;
+    private List<OrderedLineItem> items;
     private BigDecimal totalAmount;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class OrderItemDetail {
+    public static class OrderedLineItem {   // Order Service uses OrderedLineItem, not OrderItemDetail
         private String menuItemCode;
         private String itemName;
         private int quantity;
