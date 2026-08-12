@@ -1811,3 +1811,43 @@ body {
     background: rgba(240, 173, 78, 0.15);
     color: #c07a1f;
 }
+
+/* ============================================================
+   RESTAURANT SERVICE — modal overlay helpers
+   ============================================================ */
+
+/* field-group used inside edit modals — matches form-group style */
+.field-group {
+    margin-bottom: 1rem;
+}
+
+.field-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.field-group input,
+.field-group select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fffdfa;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    padding: 13px 15px;
+    outline: none;
+    height: 48px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-group input:focus,
+.field-group select:focus {
+    border-color: var(--orange, #e8975a);
+}

@@ -750,6 +750,27 @@ function renderRestaurantList(restaurants, container) {
                 `).join("")}
             </div>` : ""}
 
+            <div class="profile-actions" style="margin-top: 1rem;">
+                <div class="action-item">
+                    <button class="secondary-button"
+                        onclick="rstOpenEditModal('${escapeHtml(r.restaurantCode)}')">
+                        Edit Details
+                    </button>
+                </div>
+                <div class="action-item">
+                    <button class="secondary-button"
+                        onclick="rstGoManage('${escapeHtml(r.restaurantCode)}')">
+                        Manage Menu
+                    </button>
+                </div>
+                <div class="action-item">
+                    <button class="danger-button"
+                        onclick="rstDeleteRestaurant('${escapeHtml(r.restaurantCode)}')">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
         </div>
     `).join("");
 }
@@ -945,6 +966,10 @@ function renderMenuItemsForManage(items) {
         <div class="profile-card" style="margin-bottom: 1rem;">
             <div class="profile-details">
                 <div class="profile-item">
+                    <span class="profile-label">CODE</span>
+                    <strong>${escapeHtml(item.menuItemCode || "—")}</strong>
+                </div>
+                <div class="profile-item">
                     <span class="profile-label">ITEM</span>
                     <strong>${escapeHtml(item.name)}</strong>
                 </div>
@@ -964,6 +989,12 @@ function renderMenuItemsForManage(items) {
             <div class="profile-actions" style="margin-top: 0.75rem;">
                 <div class="action-item">
                     <button class="secondary-button"
+                        onclick="rstOpenEditMenuItemModal('${escapeHtml(item.menuItemCode)}', '${escapeHtml(item.name)}', ${parseFloat(item.price).toFixed(2)}, '${escapeHtml(item.category || "")}', ${item.available})">
+                        Edit
+                    </button>
+                </div>
+                <div class="action-item">
+                    <button class="secondary-button"
                         onclick="rstToggleAvailability('${escapeHtml(item.menuItemCode)}', ${item.available})">
                         ${item.available ? "Mark Unavailable" : "Mark Available"}
                     </button>
@@ -971,7 +1002,7 @@ function renderMenuItemsForManage(items) {
                 <div class="action-item">
                     <button class="danger-button"
                         onclick="rstDeleteMenuItem('${escapeHtml(item.menuItemCode)}')">
-                        Remove Item
+                        Remove
                     </button>
                 </div>
             </div>
@@ -1063,6 +1094,244 @@ function escapeHtml(str) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+}
+
+// ------------------------------------------------------------
+// DELETE RESTAURANT
+// ------------------------------------------------------------
+
+async function rstDeleteRestaurant(restaurantCode) {
+    if (!confirm("Are you sure you want to delete this restaurant? This cannot be undone.")) return;
+
+    try {
+        await rstApiRequest(`/${encodeURIComponent(restaurantCode)}`, { method: "DELETE" });
+        showToast("Restaurant deleted.", "success");
+        // Reload the list
+        const { data } = await rstApiRequest("");
+        renderRestaurantList(data, document.getElementById("rstListContainer"));
+    } catch (error) {
+        showToast(error.message, "error");
+    }
+}
+
+// ------------------------------------------------------------
+// GO TO MANAGE (load restaurant into manage section from browse)
+// ------------------------------------------------------------
+
+async function rstGoManage(restaurantCode) {
+    try {
+        const { data } = await rstApiRequest(`/${encodeURIComponent(restaurantCode)}`);
+        currentRestaurant = data;
+        loadRestaurantForManage(data);
+        showPage("addRestaurant");
+        showToast(`Managing: ${data.name}`, "success");
+    } catch (error) {
+        showToast(error.message, "error");
+    }
+}
+
+// ------------------------------------------------------------
+// EDIT RESTAURANT MODAL
+// ------------------------------------------------------------
+
+function rstOpenEditModal(restaurantCode) {
+    // Find restaurant data from current list
+    rstApiRequest(`/${encodeURIComponent(restaurantCode)}`).then(({ data }) => {
+
+        // Build a simple inline edit form inside a modal-like overlay
+        const existing = document.getElementById("rstEditOverlay");
+        if (existing) existing.remove();
+
+        const overlay = document.createElement("div");
+        overlay.id = "rstEditOverlay";
+        overlay.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        `;
+
+        overlay.innerHTML = `
+            <div class="register-card" style="max-width: 480px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Edit Restaurant</h3>
+
+                <div class="field-group">
+                    <label>Name</label>
+                    <input type="text" id="rstEditName" value="${escapeHtml(data.name || "")}">
+                </div>
+                <div class="field-group">
+                    <label>Description</label>
+                    <input type="text" id="rstEditDescription" value="${escapeHtml(data.description || "")}">
+                </div>
+                <div class="field-group">
+                    <label>Cuisine</label>
+                    <input type="text" id="rstEditCuisine" value="${escapeHtml(data.cuisine || "")}">
+                </div>
+                <div class="field-group">
+                    <label>Owner Name</label>
+                    <input type="text" id="rstEditOwnerName" value="${escapeHtml(data.ownerName || "")}">
+                </div>
+                <div class="field-group">
+                    <label>Contact Phone</label>
+                    <input type="tel" id="rstEditPhone" value="${escapeHtml(data.contactPhone || "")}">
+                </div>
+                <div class="field-group">
+                    <label>Contact Email</label>
+                    <input type="email" id="rstEditEmail" value="${escapeHtml(data.contactEmail || "")}">
+                </div>
+                <div class="field-group">
+                    <label>Opening Hours</label>
+                    <input type="text" id="rstEditHours" value="${escapeHtml(data.openingHours || "")}">
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="register-button" id="rstEditSaveBtn"
+                        onclick="rstSaveRestaurantEdit('${escapeHtml(restaurantCode)}')">
+                        <span class="button-label">Save Changes</span>
+                    </button>
+                    <button class="secondary-button"
+                        onclick="document.getElementById('rstEditOverlay').remove()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        // Close on backdrop click
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) overlay.remove();
+        });
+    }).catch(error => showToast(error.message, "error"));
+}
+
+async function rstSaveRestaurantEdit(restaurantCode) {
+    const payload = {
+        name:         document.getElementById("rstEditName").value.trim() || null,
+        description:  document.getElementById("rstEditDescription").value.trim() || null,
+        cuisine:      document.getElementById("rstEditCuisine").value.trim() || null,
+        ownerName:    document.getElementById("rstEditOwnerName").value.trim() || null,
+        contactPhone: document.getElementById("rstEditPhone").value.trim() || null,
+        contactEmail: document.getElementById("rstEditEmail").value.trim() || null,
+        openingHours: document.getElementById("rstEditHours").value.trim() || null,
+    };
+
+    const btn = document.getElementById("rstEditSaveBtn");
+    btn.disabled = true;
+    btn.querySelector(".button-label").textContent = "Saving...";
+
+    try {
+        await rstApiRequest(`/${encodeURIComponent(restaurantCode)}`, {
+            method: "PUT",
+            body: JSON.stringify(payload)
+        });
+
+        document.getElementById("rstEditOverlay").remove();
+        showToast("Restaurant updated!", "success");
+
+        // Reload the list to reflect changes
+        const { data } = await rstApiRequest("");
+        renderRestaurantList(data, document.getElementById("rstListContainer"));
+
+    } catch (error) {
+        showToast(error.message, "error");
+        btn.disabled = false;
+        btn.querySelector(".button-label").textContent = "Save Changes";
+    }
+}
+
+// ------------------------------------------------------------
+// EDIT MENU ITEM MODAL
+// ------------------------------------------------------------
+
+function rstOpenEditMenuItemModal(menuItemCode, name, price, category, available) {
+    const existing = document.getElementById("rstEditMenuOverlay");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "rstEditMenuOverlay";
+    overlay.style.cssText = `
+        position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+        display: flex; align-items: center; justify-content: center; z-index: 1000;
+    `;
+
+    overlay.innerHTML = `
+        <div class="register-card" style="max-width: 400px; width: 90%;">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Edit Menu Item</h3>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Code: ${escapeHtml(menuItemCode)}
+            </p>
+
+            <div class="field-group">
+                <label>Name</label>
+                <input type="text" id="rstEditItemName" value="${escapeHtml(name)}">
+            </div>
+            <div class="field-group">
+                <label>Price (RM)</label>
+                <input type="number" id="rstEditItemPrice" value="${price}" min="0.01" step="0.01">
+            </div>
+            <div class="field-group">
+                <label>Category</label>
+                <input type="text" id="rstEditItemCategory" value="${escapeHtml(category)}">
+            </div>
+            <div class="field-group">
+                <label>Available</label>
+                <select id="rstEditItemAvailable">
+                    <option value="true"  ${available ? "selected" : ""}>Yes</option>
+                    <option value="false" ${!available ? "selected" : ""}>No</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="register-button" id="rstEditItemSaveBtn"
+                    onclick="rstSaveMenuItemEdit('${escapeHtml(menuItemCode)}')">
+                    <span class="button-label">Save Changes</span>
+                </button>
+                <button class="secondary-button"
+                    onclick="document.getElementById('rstEditMenuOverlay').remove()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) overlay.remove();
+    });
+}
+
+async function rstSaveMenuItemEdit(menuItemCode) {
+    if (!currentRestaurant) return;
+
+    const payload = {
+        name:      document.getElementById("rstEditItemName").value.trim() || null,
+        price:     parseFloat(document.getElementById("rstEditItemPrice").value) || null,
+        category:  document.getElementById("rstEditItemCategory").value.trim() || null,
+        available: document.getElementById("rstEditItemAvailable").value === "true"
+    };
+
+    const btn = document.getElementById("rstEditItemSaveBtn");
+    btn.disabled = true;
+    btn.querySelector(".button-label").textContent = "Saving...";
+
+    try {
+        await rstApiRequest(
+            `/${encodeURIComponent(currentRestaurant.restaurantCode)}/menu/${encodeURIComponent(menuItemCode)}`,
+            { method: "PUT", body: JSON.stringify(payload) }
+        );
+
+        document.getElementById("rstEditMenuOverlay").remove();
+        showToast("Menu item updated!", "success");
+
+        // Reload menu list
+        const { data } = await rstApiRequest(`/${encodeURIComponent(currentRestaurant.restaurantCode)}`);
+        currentRestaurant = data;
+        renderMenuItemsForManage(data.menuItems || []);
+
+    } catch (error) {
+        showToast(error.message, "error");
+        btn.disabled = false;
+        btn.querySelector(".button-label").textContent = "Save Changes";
+    }
 }
 
 // ============================================================
