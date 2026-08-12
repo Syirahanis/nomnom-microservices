@@ -22,7 +22,7 @@ public class OrderKafkaConsumer {
 
         System.out.println("Received OrderConfirmed event: " + event);
 
-        orderService.handleOrderConfirmed(event.getOrderId());
+        orderService.handleOrderConfirmed(event.getorderCode());
     }
 
     @KafkaListener(
@@ -34,6 +34,6 @@ public class OrderKafkaConsumer {
 
         System.out.println("Received OrderDelivered event: " + event);
 
-        orderService.handleOrderDelivered(event.getOrderId());
+        orderService.handleOrderDelivered(event.getorderCode());
     }
 }

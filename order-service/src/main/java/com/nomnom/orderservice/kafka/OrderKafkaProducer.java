@@ -17,7 +17,7 @@ public class OrderKafkaProducer {
 
         kafkaTemplate.send(
                 TOPIC,
-                event.getOrderId(),
+                event.getorderCode(),
                 event
         );
     }

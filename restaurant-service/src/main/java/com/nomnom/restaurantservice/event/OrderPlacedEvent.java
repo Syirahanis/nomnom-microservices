@@ -10,13 +10,13 @@ import java.util.List;
 // DDD Domain Event: OrderPlacedEvent
 // Published by Order Service to topic "order.placed".
 // Field names must match Order Service's OrderPlacedEvent exactly —
-// orderId and OrderedLineItem are the names Order Service uses.
+// orderCode and OrderedLineItem are the names Order Service uses.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderPlacedEvent {
 
-    private String orderId;            // Order Service uses orderId, not orderCode
+    private String orderCode;            // Order Service uses orderCode, not orderCode
     private String customerCode;
     private String restaurantCode;
     private List<OrderedLineItem> items;

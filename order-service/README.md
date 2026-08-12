@@ -92,8 +92,8 @@ docker exec -it nomnom-kafka /opt/kafka/bin/kafka-console-producer.sh \
 ```
 then paste (single line) and press Enter:
 ```json
-{"orderId":"ORDXXXXXXXXXXXXX","restaurantCode":"REST001","status":"CONFIRMED"}
-{"orderId":"ORD1786511183845","restaurantCode":"REST001","status":"CONFIRMED"}
+{"orderCode":"ORDXXXXXXXXXXXXX","restaurantCode":"REST001","status":"CONFIRMED"}
+{"orderCode":"ORD1786511183845","restaurantCode":"REST001","status":"CONFIRMED"}
 ```
 _(7) Confirm the status changed_:
 ```shell
@@ -116,9 +116,9 @@ curl -X GET http://localhost:8082/orders/{ORD1786511183845}
 
 | Topic             | Direction | Payload                                        |
 |--------------------|-----------|--------------------------------------------------|
-| `order.placed`     | publishes | orderId, customerCode, restaurantCode, items[]   |
-| `order.confirmed`  | consumes  | orderId, restaurantCode, status                  |
-| `order.delivered`  | consumes  | orderId, customerCode, status                    |
+| `order.placed`     | publishes | orderCode, customerCode, restaurantCode, items[]   |
+| `order.confirmed`  | consumes  | orderCode, restaurantCode, status                  |
+| `order.delivered`  | consumes  | orderCode, customerCode, status                    |
 
 ## Troubleshooting
 

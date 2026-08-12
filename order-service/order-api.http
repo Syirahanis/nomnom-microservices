@@ -80,6 +80,6 @@ Content-Type: application/json
 ###     --topic order.confirmed --broker-list localhost:9092
 ###
 ### then paste (single line):
-###   {"orderId":"ORDXXXXXXXXXXXXX","restaurantCode":"REST001","status":"CONFIRMED"}
+###   {"orderCode":"ORDXXXXXXXXXXXXX","restaurantCode":"REST001","status":"CONFIRMED"}
 ###
 ### GET the order afterwards - status should now show CONFIRMED.

@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderPlacedEvent {
 
-    private String orderId;
+    private String orderCode;
     private String customerCode;
     private String restaurantCode;
     private List<OrderedLineItem> items;
