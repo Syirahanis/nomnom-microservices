@@ -1,0 +1,208 @@
+### ==========================================
+### RESTAURANT & CATALOG SERVICE - REST API
+### Port: 8081
+### ==========================================
+
+
+### ==========================================
+### RESTAURANT CRUD
+### ==========================================
+
+### 1. Register a Restaurant
+POST http://localhost:8081/restaurants
+Content-Type: application/json
+
+{
+  "name": "Nasi Lemak Corner",
+  "description": "Authentic Malaysian comfort food since 2010",
+  "cuisine": "Malaysian",
+  "ownerName": "Ahmad Rizal",
+  "contactPhone": "0123456789",
+  "contactEmail": "nasilemakcorner@example.com",
+  "openingHours": "Mon-Sun 07:00-22:00",
+  "address": {
+    "street": "Jalan Ampang",
+    "postcode": "50450",
+    "city": "Kuala Lumpur",
+    "state": "WP Kuala Lumpur",
+    "country": "Malaysia"
+  }
+}
+
+
+### 2. Get All Restaurants
+GET http://localhost:8081/restaurants
+
+
+### 3. Get Restaurant by Restaurant Code
+### Replace RSTXXXXXXXXXXXXXXX with the code returned from registration
+GET http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX
+
+
+### 4. Update Restaurant Details
+### Replace RSTXXXXXXXXXXXXXXX with the registered restaurant's code
+PUT http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX
+Content-Type: application/json
+
+{
+  "name": "Nasi Lemak Corner (Updated)",
+  "description": "Authentic Malaysian comfort food — now with delivery!",
+  "openingHours": "Mon-Sun 07:00-23:00",
+  "contactEmail": "updated@example.com"
+}
+
+
+### 5. Get Updated Restaurant
+### Replace RSTXXXXXXXXXXXXXXX with the registered restaurant's code
+GET http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX
+
+
+### 6. Delete (Suspend) Restaurant
+### Soft delete — status changes to SUSPENDED, record remains in H2
+### Replace RSTXXXXXXXXXXXXXXX with the registered restaurant's code
+DELETE http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX
+
+
+### 7. Verify Soft Delete
+### Restaurant should still exist with status = SUSPENDED
+### Replace RSTXXXXXXXXXXXXXXX with the registered restaurant's code
+GET http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX
+
+
+### 8. Non-Existing Restaurant
+GET http://localhost:8081/restaurants/RST999999999999
+
+
+### ==========================================
+### MENU ITEM CRUD
+### ==========================================
+
+### 9. Add Menu Item to Restaurant
+### Replace RSTXXXXXXXXXXXXXXX with a valid restaurant code
+POST http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu
+Content-Type: application/json
+
+{
+  "name": "Nasi Lemak Special",
+  "description": "Fragrant coconut rice served with sambal, anchovies, peanuts and egg",
+  "price": 12.90,
+  "category": "Main Course"
+}
+
+
+### 10. Add Second Menu Item
+### Replace RSTXXXXXXXXXXXXXXX with a valid restaurant code
+POST http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu
+Content-Type: application/json
+
+{
+  "name": "Teh Tarik",
+  "description": "Frothy pulled milk tea",
+  "price": 3.50,
+  "category": "Drinks"
+}
+
+
+### 11. Add Third Menu Item
+### Replace RSTXXXXXXXXXXXXXXX with a valid restaurant code
+POST http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu
+Content-Type: application/json
+
+{
+  "name": "Cendol",
+  "description": "Classic Malaysian dessert with coconut milk and palm sugar",
+  "price": 6.00,
+  "category": "Dessert"
+}
+
+
+### 12. Get All Menu Items for a Restaurant
+### Replace RSTXXXXXXXXXXXXXXX with a valid restaurant code
+GET http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu
+
+
+### 13. Update a Menu Item (e.g. change price and availability)
+### Replace RSTXXXXXXXXXXXXXXX with the restaurant code
+### Replace ITMXXXXXXXXXXXXXXX with the menu item code returned from step 9
+PUT http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu/ITMXXXXXXXXXXXXXXX
+Content-Type: application/json
+
+{
+  "price": 14.90,
+  "available": true
+}
+
+
+### 14. Mark Menu Item as Unavailable (e.g. sold out)
+### Replace RSTXXXXXXXXXXXXXXX and ITMXXXXXXXXXXXXXXX with actual codes
+PUT http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu/ITMXXXXXXXXXXXXXXX
+Content-Type: application/json
+
+{
+  "available": false
+}
+
+
+### 15. Delete a Menu Item
+### Replace RSTXXXXXXXXXXXXXXX and ITMXXXXXXXXXXXXXXX with actual codes
+DELETE http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu/ITMXXXXXXXXXXXXXXX
+
+
+### ==========================================
+### KAFKA DEMONSTRATION
+### ==========================================
+
+### 16. Register Restaurant — triggers RestaurantRegistered Kafka event
+### Check console log for: "Published RestaurantRegistered event"
+POST http://localhost:8081/restaurants
+Content-Type: application/json
+
+{
+  "name": "Kafka Demo Restaurant",
+  "description": "Used to demonstrate the RestaurantRegistered domain event",
+  "cuisine": "Western",
+  "ownerName": "Kafka Demo Owner",
+  "contactPhone": "0111234567",
+  "contactEmail": "kafka.demo@example.com",
+  "openingHours": "Mon-Fri 09:00-18:00",
+  "address": {
+    "street": "Jalan Demo",
+    "postcode": "47500",
+    "city": "Subang Jaya",
+    "state": "Selangor",
+    "country": "Malaysia"
+  }
+}
+
+
+### 17. Add Menu Item to Kafka Demo Restaurant
+### Replace RSTXXXXXXXXXXXXXXX with the code returned from step 16
+### This item will be validated when Order Service publishes an OrderPlaced event
+POST http://localhost:8081/restaurants/RSTXXXXXXXXXXXXXXX/menu
+Content-Type: application/json
+
+{
+  "name": "Demo Burger",
+  "description": "A burger used to test the OrderPlaced -> OrderConfirmed Kafka flow",
+  "price": 18.00,
+  "category": "Main Course"
+}
+
+
+### ==========================================
+### END-TO-END KAFKA FLOW NOTE
+### ==========================================
+### To demonstrate the full Kafka event flow:
+###
+### 1. Register a restaurant (step 1) — triggers RestaurantRegistered event
+### 2. Add a menu item (step 9) — note the menuItemCode returned
+### 3. Go to Order Service (port 8082) and place an order using:
+###    - the restaurantCode from step 1
+###    - the menuItemCode from step 2
+### 4. Order Service publishes OrderPlaced event on Kafka topic "order.placed"
+### 5. Restaurant Service consumes it, validates item availability,
+###    then publishes OrderConfirmed event on topic "order.confirmed"
+### 6. Check the Restaurant Service console for:
+###    "Received OrderPlaced event: ..."
+###    "Published OrderConfirmed event for order: ..."
+### ==========================================
