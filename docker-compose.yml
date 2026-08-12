@@ -97,3 +97,4 @@ services:
       - customer-service
       - restaurant-service
       - order-service
+      - delivery-service

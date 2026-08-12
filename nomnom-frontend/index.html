@@ -57,6 +57,16 @@
             </a>
             <!-- ===== END ORDER SERVICE NAV ===== -->
 
+            <!-- delivery service stuff  -->
+            <a href="#" id="deliveriesNav"
+               onclick="showPage('deliveries'); return false;">
+                Deliveries
+            </a>
+
+            <a href="#" id="ridersNav"
+               onclick="showPage('riders'); return false;">
+                Riders
+            </a>
         </nav>
 
     </header>
@@ -892,6 +902,137 @@
     </main>
 
     <!-- ===== END ORDER SERVICE PAGES ===== -->
+
+    <!-- =============================================================
+         DELIVERY SERVICE — DELIVERIES PAGE
+         API: http://localhost:8083/api/deliveries
+    ============================================================== -->
+
+    <main id="deliveriesPage" class="page">
+
+        <section class="register-page">
+            <div class="register-container">
+
+                <div class="register-header">
+                    <p class="eyebrow">DELIVERY &amp; RIDER SERVICE</p>
+                    <h1>Track<br><span>Deliveries.</span></h1>
+                    <p class="page-description">
+                        Follow the full delivery lifecycle — from rider assignment
+                        to in-transit and final delivery. Data is served live from
+                        the Delivery Service, which reacts to OrderConfirmed events
+                        over Kafka.
+                    </p>
+                </div>
+
+                <!-- Lookup by delivery code -->
+                <div class="lookup-bar" id="dlvLookupBar" style="margin-bottom: 1.5rem;">
+                    <div class="lookup-field">
+                        <label for="dlvLookupCode">Look up by delivery code</label>
+                        <input type="text" id="dlvLookupCode" placeholder="e.g. DEL1733999999999">
+                    </div>
+                    <button type="button" class="secondary-button" id="dlvLookupButton">Find Delivery</button>
+                </div>
+
+                <!-- Lookup by order code -->
+                <div class="lookup-bar" id="dlvOrderLookupBar" style="margin-bottom: 1.5rem;">
+                    <div class="lookup-field">
+                        <label for="dlvLookupOrderCode">Look up by order code</label>
+                        <input type="text" id="dlvLookupOrderCode" placeholder="e.g. ORD1733999999999">
+                    </div>
+                    <button type="button" class="secondary-button" id="dlvLookupOrderButton">Find by Order</button>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <button type="button" class="secondary-button" id="dlvLoadAllButton">Load All Deliveries</button>
+                </div>
+
+                <!-- Delivery list -->
+                <div id="dlvListContainer">
+                    <p style="color: #888;">Click "Load All Deliveries" to see the full list.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- =============================================================
+         DELIVERY SERVICE — RIDERS PAGE
+         API: http://localhost:8083/api/riders
+    ============================================================== -->
+
+    <main id="ridersPage" class="page">
+
+        <section class="register-page">
+            <div class="register-container">
+
+                <div class="register-header">
+                    <p class="eyebrow">DELIVERY &amp; RIDER SERVICE</p>
+                    <h1>Manage<br><span>Riders.</span></h1>
+                    <p class="page-description">
+                        Register delivery riders and view their availability.
+                        Available riders are automatically matched to confirmed
+                        orders by the Delivery Service.
+                    </p>
+                </div>
+
+                <!-- Register Rider Form -->
+                <form id="riderRegisterForm" class="register-card" novalidate>
+
+                    <div class="form-grid">
+
+                        <div class="form-group full-width">
+                            <span class="address-legend">Register Rider</span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="riderName">Rider Name</label>
+                            <input type="text" id="riderName" placeholder="e.g. Ahmad bin Ali" required>
+                            <span class="field-error" id="rider-err-name"></span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="riderPhone">Phone Number</label>
+                            <input type="tel" id="riderPhone" placeholder="e.g. 0123456789" required>
+                            <span class="field-error" id="rider-err-phoneNumber"></span>
+                        </div>
+
+                        <div class="form-submit">
+                            <button type="submit" class="register-button" id="riderRegisterButton">
+                                <span class="button-label">Register Rider</span>
+                                <span class="button-arrow">→</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </form>
+
+                <!-- Lookup rider by code -->
+                <div class="lookup-bar" id="riderLookupBar" style="margin-top: 1.5rem;">
+                    <div class="lookup-field">
+                        <label for="riderLookupCode">Look up by rider code</label>
+                        <input type="text" id="riderLookupCode" placeholder="e.g. RID1733999999999">
+                    </div>
+                    <button type="button" class="secondary-button" id="riderLookupButton">Find Rider</button>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <button type="button" class="secondary-button" id="riderLoadAllButton">Load All Riders</button>
+                </div>
+
+                <!-- Rider list -->
+                <div id="riderListContainer">
+                    <p style="color: #888;">Click "Load All Riders" to see the full list.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== END DELIVERY SERVICE PAGES ===== -->
 
     <!-- =========================
          FOOTER

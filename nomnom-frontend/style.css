@@ -1684,3 +1684,130 @@ body {
 .ord-status-confirmed { background: #5bc0de; }
 .ord-status-delivered { background: #5cb85c; }
 .ord-status-cancelled { background: #d9534f; }
+
+/* delivery stuff */
+
+#dlvLookupBar .lookup-field input,
+#dlvOrderLookupBar .lookup-field input,
+#riderLookupBar .lookup-field input {
+    color: var(--green);
+    background: #f4f7f5;
+    border-color: #c8d8d2;
+}
+
+#dlvLookupBar .lookup-field input::placeholder,
+#dlvOrderLookupBar .lookup-field input::placeholder,
+#riderLookupBar .lookup-field input::placeholder {
+    color: #8fa89f;
+}
+
+#dlvLookupBar .lookup-field label,
+#dlvOrderLookupBar .lookup-field label,
+#riderLookupBar .lookup-field label {
+    color: #4a6b5e;
+}
+
+#dlvLookupButton,
+#dlvLookupOrderButton,
+#dlvLoadAllButton,
+#riderLookupButton,
+#riderLoadAllButton {
+    color: var(--green);
+    background: transparent;
+    border: 2px solid var(--green);
+}
+
+#dlvLookupButton:hover,
+#dlvLookupOrderButton:hover,
+#dlvLoadAllButton:hover,
+#riderLookupButton:hover,
+#riderLoadAllButton:hover {
+    background: var(--green);
+    color: var(--white);
+}
+
+.dlv-status-assigned  { background: #f0ad4e; }
+.dlv-status-in_transit,
+.dlv-status-in-transit { background: #5bc0de; }
+.dlv-status-delivered { background: #5cb85c; }
+
+.rider-status-available { background: #5cb85c; }
+.rider-status-busy      { background: #f0ad4e; }
+
+.dlv-stepper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.dlv-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #7f958d;
+    text-transform: uppercase;
+}
+
+.dlv-step .dlv-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #c8d8d2;
+    flex-shrink: 0;
+}
+
+.dlv-step.dlv-done {
+    color: #4a6b5e;
+}
+
+.dlv-step.dlv-done .dlv-dot {
+    background: #5cb85c;
+}
+
+.dlv-step.dlv-current {
+    color: var(--green);
+}
+
+.dlv-step.dlv-current .dlv-dot {
+    background: var(--orange);
+    box-shadow: 0 0 0 3px rgba(244, 119, 46, 0.2);
+}
+
+.dlv-step-arrow {
+    color: #c8d8d2;
+    font-size: 12px;
+}
+
+.rider-availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.rider-availability .rider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.rider-availability.rider-available {
+    background: rgba(92, 184, 92, 0.15);
+    color: #3f9c4a;
+}
+
+.rider-availability.rider-busy {
+    background: rgba(240, 173, 78, 0.15);
+    color: #c07a1f;
+}

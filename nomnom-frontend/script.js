@@ -1464,6 +1464,434 @@ async function ordCancelOrder(orderCode) {
     }
 }
 
-// ============================================================
-// END ORDER SERVICE
-// ============================================================
+// delivery stuff man
+
+
+const _originalShowPageForDelivery = showPage;
+
+showPage = function (page) {
+
+    const deliveriesPage = document.getElementById("deliveriesPage");
+    const ridersPage     = document.getElementById("ridersPage");
+
+    const deliveriesNav = document.getElementById("deliveriesNav");
+    const ridersNav     = document.getElementById("ridersNav");
+
+    [deliveriesPage, ridersPage].forEach(el => el && el.classList.remove("active-page"));
+    [deliveriesNav, ridersNav].forEach(el => el && el.classList.remove("active"));
+
+    if (page === "deliveries") {
+
+        deliveriesPage.classList.add("active-page");
+        deliveriesNav.classList.add("active");
+        dlvDeactivateOtherPages();
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } else if (page === "riders") {
+
+        ridersPage.classList.add("active-page");
+        ridersNav.classList.add("active");
+        dlvDeactivateOtherPages();
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } else {
+        _originalShowPageForDelivery(page);
+    }
+};
+
+function dlvDeactivateOtherPages() {
+    ["registerPage", "profilePage", "restaurantsPage", "addRestaurantPage",
+     "placeOrderPage", "myOrdersPage"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("active-page");
+    });
+    ["registerNav", "profileNav", "restaurantsNav", "addRestaurantNav",
+     "placeOrderNav", "myOrdersNav"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("active");
+    });
+}
+
+
+async function sendAPI(base, path, options = {}) {
+
+    let response;
+
+    try {
+        response = await fetch(`${base}${path}`, {
+            headers: { "Content-Type": "application/json" },
+            ...options
+        });
+    } catch (networkError) {
+        throw new Error(
+            "Could not reach Delivery Service. Make sure it is running on http://localhost:8083."
+        );
+    }
+
+    if (response.status === 204) {
+        return { ok: true, data: null };
+    }
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok) {
+        const error = new Error(
+            (data && data.message) || "Something went wrong. Please try again."
+        );
+        error.fieldErrors = data && data.fieldErrors;
+        error.status = response.status;
+        throw error;
+    }
+
+    return { ok: true, data };
+}
+
+
+document.getElementById("dlvLookupButton")
+    .addEventListener("click", async function () {
+
+        const code = document.getElementById("dlvLookupCode").value.trim();
+
+        if (!code) {
+            showToast("Enter a delivery code to look up.", "error");
+            return;
+        }
+
+        this.disabled = true;
+        this.textContent = "Searching...";
+
+        try {
+            const { data } = await sendAPI("http://localhost:8083/api/deliveries", `/${encodeURIComponent(code)}`);
+            renderDeliveryList([data], document.getElementById("dlvListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Find Delivery";
+        }
+    });
+
+
+document.getElementById("dlvLookupOrderButton")
+    .addEventListener("click", async function () {
+
+        const code = document.getElementById("dlvLookupOrderCode").value.trim();
+
+        if (!code) {
+            showToast("Enter an order code to look up.", "error");
+            return;
+        }
+
+        this.disabled = true;
+        this.textContent = "Searching...";
+
+        try {
+            const { data } = await sendAPI("http://localhost:8083/api/deliveries", `/order/${encodeURIComponent(code)}`);
+            renderDeliveryList([data], document.getElementById("dlvListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Find by Order";
+        }
+    });
+
+
+document.getElementById("dlvLoadAllButton")
+    .addEventListener("click", async function () {
+
+        this.disabled = true;
+        this.textContent = "Loading...";
+
+        try {
+            const { data } = await sendAPI("http://localhost:8083/api/deliveries", "");
+            renderDeliveryList(data, document.getElementById("dlvListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Load All Deliveries";
+        }
+    });
+
+function renderDeliveryList(deliveries, container) {
+
+    if (!deliveries || deliveries.length === 0) {
+        container.innerHTML = "<p style='color: #888;'>No deliveries found.</p>";
+        return;
+    }
+
+    container.innerHTML = deliveries.map(d => {
+
+        const statusKey = (d.status || "").toLowerCase().replace("_", "-");
+        const stepper = dlvBuildStepper(d.status);
+
+        return `
+        <div class="profile-card" style="margin-bottom: 1.5rem;">
+
+            <div class="profile-top">
+                <div class="profile-avatar">D</div>
+                <div class="profile-main">
+                    <h2>Delivery ${escapeHtml(d.deliveryCode)}</h2>
+                    <p class="customer-code">Order: <span>${escapeHtml(d.orderId)}</span></p>
+                </div>
+                <div class="status-badge dlv-status-${statusKey}">${escapeHtml(d.status)}</div>
+            </div>
+
+            <div class="profile-details">
+
+                <div class="profile-item">
+                    <span class="profile-label">RIDER</span>
+                    <strong>${escapeHtml(d.riderId || "—")}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">DELIVERY ADDRESS</span>
+                    <strong>${escapeHtml(d.deliveryAddress || "—")}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">ASSIGNED AT</span>
+                    <strong>${d.assignedAt ? new Date(d.assignedAt).toLocaleString() : "—"}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">IN TRANSIT AT</span>
+                    <strong>${d.inTransitAt ? new Date(d.inTransitAt).toLocaleString() : "—"}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">DELIVERED AT</span>
+                    <strong>${d.deliveredAt ? new Date(d.deliveredAt).toLocaleString() : "—"}</strong>
+                </div>
+
+            </div>
+
+            <div class="profile-actions-header">
+                <span class="profile-actions-label">Lifecycle</span>
+            </div>
+
+            <div class="dlv-stepper">${stepper}</div>
+
+            ${d.status === "ASSIGNED" ? `
+            <div class="profile-actions" style="margin-top: 1rem;">
+                <div class="action-item">
+                    <button class="secondary-button" onclick="dlvUpdateStatus('${escapeHtml(d.deliveryCode)}', 'IN_TRANSIT')">
+                        Start Transit
+                    </button>
+                    <p class="action-hint">Move this delivery to IN_TRANSIT</p>
+                </div>
+            </div>` : ""}
+
+            ${d.status === "IN_TRANSIT" ? `
+            <div class="profile-actions" style="margin-top: 1rem;">
+                <div class="action-item">
+                    <button class="secondary-button" onclick="dlvUpdateStatus('${escapeHtml(d.deliveryCode)}', 'DELIVERED')">
+                        Mark Delivered
+                    </button>
+                    <p class="action-hint">Complete the delivery and publish OrderDelivered</p>
+                </div>
+            </div>` : ""}
+
+        </div>
+    `;
+    }).join("");
+}
+
+
+function dlvBuildStepper(status) {
+    const steps = ["ASSIGNED", "IN_TRANSIT", "DELIVERED"];
+    const currentIndex = steps.indexOf(status);
+
+    return steps.map((step, i) => {
+
+        let cls = "dlv-step";
+        let arrow = "";
+
+        if (i < currentIndex) {
+            cls += " dlv-done";
+        } else if (i === currentIndex) {
+            cls += " dlv-current";
+        }
+
+        if (i < steps.length - 1) {
+            arrow = `<span class="dlv-step-arrow">→</span>`;
+        }
+
+        return `
+            <span class="${cls}">
+                <span class="dlv-dot"></span>${step}
+            </span>${arrow}
+        `;
+    }).join("");
+}
+
+
+async function dlvUpdateStatus(deliveryCode, status) {
+
+    try {
+        const { data } = await sendAPI("http://localhost:8083/api/deliveries", `/${encodeURIComponent(deliveryCode)}/status`, {
+            method: "PUT",
+            body: JSON.stringify({ status })
+        });
+
+        showToast(`Delivery ${deliveryCode} is now ${status}.`, "success");
+
+        const { data: all } = await sendAPI("http://localhost:8083/api/deliveries", "");
+        renderDeliveryList(all, document.getElementById("dlvListContainer"));
+
+    } catch (error) {
+        showToast(error.message, "error");
+    }
+}
+
+
+document.getElementById("riderRegisterForm")
+    .addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        document.querySelectorAll("[id^='rider-err-']").forEach(el => el.textContent = "");
+
+        const payload = {
+            name:        document.getElementById("riderName").value.trim(),
+            phoneNumber: document.getElementById("riderPhone").value.trim()
+        };
+
+        const btn   = document.getElementById("riderRegisterButton");
+        const label = btn.querySelector(".button-label");
+        btn.disabled = true;
+        label.textContent = "Registering...";
+
+        try {
+            const { data } = await sendAPI("http://localhost:8083/api/riders", "", {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            showToast(`Rider registered! Code: ${data.riderCode}`, "success");
+
+            document.getElementById("riderRegisterForm").reset();
+
+            const { data: all } = await sendAPI("http://localhost:8083/api/riders", "");
+            renderRiderList(all, document.getElementById("riderListContainer"));
+
+        } catch (error) {
+
+            if (error.fieldErrors) {
+                Object.entries(error.fieldErrors).forEach(([field, msg]) => {
+                    const el = document.getElementById(`rider-err-${field}`);
+                    if (el) el.textContent = msg;
+                });
+            }
+
+            showToast(error.message, "error");
+
+        } finally {
+            btn.disabled = false;
+            label.textContent = "Register Rider";
+        }
+    });
+
+
+document.getElementById("riderLookupButton")
+    .addEventListener("click", async function () {
+
+        const code = document.getElementById("riderLookupCode").value.trim();
+
+        if (!code) {
+            showToast("Enter a rider code to look up.", "error");
+            return;
+        }
+
+        this.disabled = true;
+        this.textContent = "Searching...";
+
+        try {
+            const { data } = await sendAPI("http://localhost:8083/api/riders", `/${encodeURIComponent(code)}`);
+            renderRiderList([data], document.getElementById("riderListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Find Rider";
+        }
+    });
+
+
+document.getElementById("riderLoadAllButton")
+    .addEventListener("click", async function () {
+
+        this.disabled = true;
+        this.textContent = "Loading...";
+
+        try {
+            const { data } = await sendAPI("http://localhost:8083/api/riders", "");
+            renderRiderList(data, document.getElementById("riderListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Load All Riders";
+        }
+    });
+
+
+function renderRiderList(riders, container) {
+
+    if (!riders || riders.length === 0) {
+        container.innerHTML = "<p style='color: #888;'>No riders found.</p>";
+        return;
+    }
+
+    container.innerHTML = riders.map(r => {
+
+        const statusKey = (r.status || "").toLowerCase();
+        const available = statusKey === "available";
+
+        return `
+        <div class="profile-card" style="margin-bottom: 1.5rem;">
+
+            <div class="profile-top">
+                <div class="profile-avatar">${escapeHtml((r.name || "R").charAt(0).toUpperCase())}</div>
+                <div class="profile-main">
+                    <h2>${escapeHtml(r.name)}</h2>
+                    <p class="customer-code">Rider Code: <span>${escapeHtml(r.riderCode)}</span></p>
+                </div>
+                <span class="rider-availability rider-${statusKey}">
+                    <span class="rider-dot"></span>${escapeHtml(r.status)}
+                </span>
+            </div>
+
+            <div class="profile-details">
+
+                <div class="profile-item">
+                    <span class="profile-label">PHONE NUMBER</span>
+                    <strong>${escapeHtml(r.phoneNumber || "—")}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">REGISTERED AT</span>
+                    <strong>${r.registeredAt ? new Date(r.registeredAt).toLocaleString() : "—"}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">AVAILABILITY</span>
+                    <strong>${available ? "✅ Available for orders" : "🚚 Currently on a delivery"}</strong>
+                </div>
+
+            </div>
+
+        </div>
+    `;
+    }).join("");
+}
+
