@@ -1,6 +1,6 @@
 # Restaurant & Catalog Service
 
-NomNom Food Delivery — XBAU3134N Group Assignment
+NomNom Food Delivery 
 
 ## Overview
 
