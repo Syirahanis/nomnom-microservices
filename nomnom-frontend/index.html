@@ -45,6 +45,18 @@
             </a>
             <!-- ===== END RESTAURANT SERVICE NAV ===== -->
 
+            <!-- ===== ORDER SERVICE NAV ===== -->
+            <a href="#" id="placeOrderNav"
+            onclick="showPage('placeOrder'); return false;">
+                Order Food
+            </a>
+
+            <a href="#" id="myOrdersNav"
+            onclick="showPage('myOrders'); return false;">
+                My Orders
+            </a>
+            <!-- ===== END ORDER SERVICE NAV ===== -->
+
         </nav>
 
     </header>
@@ -757,6 +769,129 @@
 
     <!-- ===== END RESTAURANT SERVICE PAGES ===== -->
 
+    <!-- =============================================================
+     ORDER SERVICE — PLACE ORDER PAGE
+     Added by Student 3 (Order Service)
+     API: http://localhost:8082/orders
+    ============================================================== -->
+
+    <main id="placeOrderPage" class="page">
+
+        <section class="register-page">
+            <div class="register-container">
+
+                <div class="register-header">
+                    <p class="eyebrow">ORDER SERVICE</p>
+                    <h1>Place<br><span>Your Order.</span></h1>
+                    <p class="page-description">
+                        Choose a restaurant, add items, and place your order.
+                        Delivery is free once your subtotal reaches RM100.
+                    </p>
+                </div>
+
+                <form id="ordPlaceOrderForm" class="register-card" novalidate>
+                    <div class="form-grid">
+
+                        <div class="form-group full-width">
+                            <span class="address-legend">Order Details</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ordCustomerCode">Customer Code</label>
+                            <input type="text" id="ordCustomerCode" placeholder="e.g. CUS1733999999999" required>
+                            <span class="field-error" id="ord-err-customerCode"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ordRestaurantCode">Restaurant Code</label>
+                            <input type="text" id="ordRestaurantCode" placeholder="e.g. RST1733999999999" required>
+                            <span class="field-error" id="ord-err-restaurantCode"></span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="ordDeliveryAddress">Delivery Address</label>
+                            <input type="text" id="ordDeliveryAddress" placeholder="e.g. 12A, Jalan Example, 40150 Shah Alam" required>
+                            <span class="field-error" id="ord-err-deliveryAddress"></span>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <span class="address-legend">Items</span>
+                        </div>
+
+                        <div class="form-group full-width" id="ordItemsContainer">
+                            <!-- item rows injected by script.js -->
+                        </div>
+
+                        <div class="form-group full-width">
+                            <button type="button" class="secondary-button" id="ordAddItemButton">+ Add Item</button>
+                        </div>
+
+                        <div class="form-submit">
+                            <button type="submit" class="register-button" id="ordPlaceOrderButton">
+                                <span class="button-label">Place Order</span>
+                                <span class="button-arrow">→</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <div id="ordPlaceOrderResult" style="margin-top: 2rem;"></div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- =============================================================
+        ORDER SERVICE — MY ORDERS PAGE
+    ============================================================== -->
+
+    <main id="myOrdersPage" class="page">
+
+        <section class="register-page">
+            <div class="register-container">
+
+                <div class="register-header">
+                    <p class="eyebrow">ORDER SERVICE</p>
+                    <h1>Track<br><span>Your Orders.</span></h1>
+                    <p class="page-description">
+                        Look up an order by its order code, or load every order
+                        placed under a customer code.
+                    </p>
+                </div>
+
+                <div class="lookup-bar" id="ordLookupBar" style="margin-bottom: 1.5rem;">
+                    <div class="lookup-field">
+                        <label for="ordLookupOrderCode">Look up by order code</label>
+                        <input type="text" id="ordLookupOrderCode" placeholder="e.g. ORD1733999999999">
+                    </div>
+                    <button type="button" class="secondary-button" id="ordLookupOrderButton">Find Order</button>
+                </div>
+
+                <div class="lookup-bar" id="ordCustomerLookupBar" style="margin-bottom: 1.5rem;">
+                    <div class="lookup-field">
+                        <label for="ordLookupCustomerCode">Look up by customer code</label>
+                        <input type="text" id="ordLookupCustomerCode" placeholder="e.g. CUS1733999999999">
+                    </div>
+                    <button type="button" class="secondary-button" id="ordLoadCustomerOrdersButton">Load My Orders</button>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <button type="button" class="secondary-button" id="ordLoadAllButton">Load All Orders</button>
+                </div>
+
+                <div id="ordListContainer">
+                    <p style="color: #888;">Look up an order above, or click "Load All Orders".</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== END ORDER SERVICE PAGES ===== -->
 
     <!-- =========================
          FOOTER

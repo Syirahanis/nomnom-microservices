@@ -1068,3 +1068,402 @@ function escapeHtml(str) {
 // ============================================================
 // END RESTAURANT & CATALOG SERVICE
 // ============================================================
+
+// ============================================================
+// ORDER SERVICE
+// Student 3 — Order Service
+// Talks to the Spring Boot Order Service API on port 8082.
+// API base: http://localhost:8082/orders
+// ============================================================
+
+const ORDER_API = "http://localhost:8082/orders";
+
+// Tracks the order most recently placed/loaded
+let currentOrder = null;
+
+
+// ------------------------------------------------------------
+// PAGE NAVIGATION — extend the existing showPage() function
+// (already patched once by the Restaurant Service) to also
+// handle the two new order pages
+// ------------------------------------------------------------
+
+const _originalShowPageForOrder = showPage;
+
+showPage = function (page) {
+
+    const placeOrderPage = document.getElementById("placeOrderPage");
+    const myOrdersPage    = document.getElementById("myOrdersPage");
+
+    const placeOrderNav = document.getElementById("placeOrderNav");
+    const myOrdersNav   = document.getElementById("myOrdersNav");
+
+    [placeOrderPage, myOrdersPage].forEach(el => el && el.classList.remove("active-page"));
+    [placeOrderNav, myOrdersNav].forEach(el => el && el.classList.remove("active"));
+
+    if (page === "placeOrder") {
+
+        placeOrderPage.classList.add("active-page");
+        placeOrderNav.classList.add("active");
+        ordDeactivateOtherPages();
+
+        // Prefill the customer code if a customer is already loaded
+        if (currentCustomer && !document.getElementById("ordCustomerCode").value) {
+            document.getElementById("ordCustomerCode").value = currentCustomer.customerCode;
+        }
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } else if (page === "myOrders") {
+
+        myOrdersPage.classList.add("active-page");
+        myOrdersNav.classList.add("active");
+        ordDeactivateOtherPages();
+
+        if (currentCustomer && !document.getElementById("ordLookupCustomerCode").value) {
+            document.getElementById("ordLookupCustomerCode").value = currentCustomer.customerCode;
+        }
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } else {
+        // Fall through to whatever navigation already existed
+        // (customer pages, or the restaurant pages patched in earlier)
+        _originalShowPageForOrder(page);
+    }
+};
+
+function ordDeactivateOtherPages() {
+    ["registerPage", "profilePage", "restaurantsPage", "addRestaurantPage"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("active-page");
+    });
+    ["registerNav", "profileNav", "restaurantsNav", "addRestaurantNav"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("active");
+    });
+}
+
+
+// ------------------------------------------------------------
+// ORDER API HELPER
+// Same pattern as apiRequest() / rstApiRequest(), pointed at port 8082
+// ------------------------------------------------------------
+
+async function ordApiRequest(path, options = {}) {
+
+    let response;
+
+    try {
+        response = await fetch(`${ORDER_API}${path}`, {
+            headers: { "Content-Type": "application/json" },
+            ...options
+        });
+    } catch (networkError) {
+        throw new Error(
+            "Could not reach Order Service. Make sure it is running on http://localhost:8082."
+        );
+    }
+
+    if (response.status === 204) {
+        return { ok: true, data: null };
+    }
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok) {
+        const error = new Error(
+            (data && data.message) || "Something went wrong. Please try again."
+        );
+        error.fieldErrors = data && data.fieldErrors;
+        error.status = response.status;
+        throw error;
+    }
+
+    return { ok: true, data };
+}
+
+
+// ------------------------------------------------------------
+// PLACE ORDER PAGE — dynamic item rows
+// ------------------------------------------------------------
+
+function ordAddItemRow() {
+
+    const container = document.getElementById("ordItemsContainer");
+
+    const row = document.createElement("div");
+    row.className = "ord-item-row";
+    row.innerHTML = `
+        <input type="text" class="ord-item-code" placeholder="Menu item code (e.g. MENU-NASI-LEMAK)">
+        <input type="text" class="ord-item-name" placeholder="Item name">
+        <input type="number" class="ord-item-qty" placeholder="Qty" min="1" value="1">
+        <input type="number" class="ord-item-price" placeholder="Unit price (RM)" min="0.01" step="0.01">
+        <button type="button" class="danger-button ord-item-remove">✕</button>
+    `;
+
+    row.querySelector(".ord-item-remove").addEventListener("click", function () {
+        if (document.querySelectorAll(".ord-item-row").length > 1) {
+            row.remove();
+        } else {
+            showToast("An order needs at least one item.", "error");
+        }
+    });
+
+    container.appendChild(row);
+}
+
+document.getElementById("ordAddItemButton")
+    .addEventListener("click", ordAddItemRow);
+
+// Start with one empty row
+ordAddItemRow();
+
+
+// ------------------------------------------------------------
+// PLACE ORDER
+// ------------------------------------------------------------
+
+document.getElementById("ordPlaceOrderForm")
+    .addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        document.querySelectorAll("[id^='ord-err-']").forEach(el => el.textContent = "");
+
+        const items = Array.from(document.querySelectorAll(".ord-item-row")).map(row => ({
+            menuItemCode: row.querySelector(".ord-item-code").value.trim(),
+            itemName:     row.querySelector(".ord-item-name").value.trim(),
+            quantity:     parseInt(row.querySelector(".ord-item-qty").value, 10),
+            unitPrice:    parseFloat(row.querySelector(".ord-item-price").value)
+        }));
+
+        const payload = {
+            customerCode:    document.getElementById("ordCustomerCode").value.trim(),
+            restaurantCode:  document.getElementById("ordRestaurantCode").value.trim(),
+            deliveryAddress: document.getElementById("ordDeliveryAddress").value.trim(),
+            items: items
+        };
+
+        const btn   = document.getElementById("ordPlaceOrderButton");
+        const label = btn.querySelector(".button-label");
+        btn.disabled = true;
+        label.textContent = "Placing Order...";
+
+        try {
+            const { data } = await ordApiRequest("", {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            currentOrder = data;
+
+            showToast(`Order placed! Code: ${data.orderCode}`, "success");
+
+            renderOrderList([data], document.getElementById("ordPlaceOrderResult"));
+
+        } catch (error) {
+
+            if (error.fieldErrors) {
+                Object.entries(error.fieldErrors).forEach(([field, msg]) => {
+                    const el = document.getElementById(`ord-err-${field}`);
+                    if (el) el.textContent = msg;
+                });
+            }
+
+            showToast(error.message, "error");
+
+        } finally {
+            btn.disabled = false;
+            label.textContent = "Place Order";
+        }
+    });
+
+
+// ------------------------------------------------------------
+// MY ORDERS PAGE — lookups
+// ------------------------------------------------------------
+
+document.getElementById("ordLookupOrderButton")
+    .addEventListener("click", async function () {
+
+        const code = document.getElementById("ordLookupOrderCode").value.trim();
+
+        if (!code) {
+            showToast("Enter an order code to look up.", "error");
+            return;
+        }
+
+        this.disabled = true;
+        this.textContent = "Searching...";
+
+        try {
+            const { data } = await ordApiRequest(`/${encodeURIComponent(code)}`);
+            renderOrderList([data], document.getElementById("ordListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Find Order";
+        }
+    });
+
+
+document.getElementById("ordLoadCustomerOrdersButton")
+    .addEventListener("click", async function () {
+
+        const code = document.getElementById("ordLookupCustomerCode").value.trim();
+
+        if (!code) {
+            showToast("Enter a customer code first.", "error");
+            return;
+        }
+
+        this.disabled = true;
+        this.textContent = "Loading...";
+
+        try {
+            const { data } = await ordApiRequest(`/customer/${encodeURIComponent(code)}`);
+            renderOrderList(data, document.getElementById("ordListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Load My Orders";
+        }
+    });
+
+
+document.getElementById("ordLoadAllButton")
+    .addEventListener("click", async function () {
+
+        this.disabled = true;
+        this.textContent = "Loading...";
+
+        try {
+            const { data } = await ordApiRequest("");
+            renderOrderList(data, document.getElementById("ordListContainer"));
+        } catch (error) {
+            showToast(error.message, "error");
+        } finally {
+            this.disabled = false;
+            this.textContent = "Load All Orders";
+        }
+    });
+
+
+function renderOrderList(orders, container) {
+
+    if (!orders || orders.length === 0) {
+        container.innerHTML = "<p style='color: #888;'>No orders found.</p>";
+        return;
+    }
+
+    container.innerHTML = orders.map(o => `
+        <div class="profile-card" style="margin-bottom: 1.5rem;">
+
+            <div class="profile-top">
+                <div class="profile-avatar">O</div>
+                <div class="profile-main">
+                    <h2>Order ${escapeHtml(o.orderCode)}</h2>
+                    <p class="customer-code">Customer: <span>${escapeHtml(o.customerCode)}</span></p>
+                </div>
+                <div class="status-badge ord-status-${(o.status || "").toLowerCase()}">${o.status}</div>
+            </div>
+
+            <div class="profile-details">
+
+                <div class="profile-item">
+                    <span class="profile-label">RESTAURANT</span>
+                    <strong>${escapeHtml(o.restaurantCode)}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">DELIVERY ADDRESS</span>
+                    <strong>${escapeHtml(o.deliveryAddress)}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">SUBTOTAL</span>
+                    <strong>${o.currency || "MYR"} ${parseFloat(o.subtotal).toFixed(2)}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">DELIVERY FEE</span>
+                    <strong>${o.currency || "MYR"} ${parseFloat(o.deliveryFee).toFixed(2)}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">TOTAL</span>
+                    <strong>${o.currency || "MYR"} ${parseFloat(o.totalAmount).toFixed(2)}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <span class="profile-label">PLACED AT</span>
+                    <strong>${o.placedAt ? new Date(o.placedAt).toLocaleString() : "—"}</strong>
+                </div>
+
+            </div>
+
+            ${o.items && o.items.length > 0 ? `
+            <div class="profile-actions-header">
+                <span class="profile-actions-label">Items (${o.items.length})</span>
+            </div>
+            <div class="profile-details">
+                ${o.items.map(item => `
+                    <div class="profile-item">
+                        <span class="profile-label">${escapeHtml(item.menuItemCode)}</span>
+                        <strong>${escapeHtml(item.itemName)} × ${item.quantity} — RM ${parseFloat(item.lineTotal).toFixed(2)}</strong>
+                    </div>
+                `).join("")}
+            </div>` : ""}
+
+            ${o.status === "PLACED" ? `
+            <div class="profile-actions" style="margin-top: 0.75rem;">
+                <div class="action-item">
+                    <button class="danger-button" onclick="ordCancelOrder('${escapeHtml(o.orderCode)}')">
+                        Cancel Order
+                    </button>
+                </div>
+            </div>` : ""}
+
+        </div>
+    `).join("");
+}
+
+
+async function ordCancelOrder(orderCode) {
+
+    if (!confirm("Cancel this order?")) return;
+
+    try {
+        const { data } = await ordApiRequest(`/${encodeURIComponent(orderCode)}/cancel`, {
+            method: "PUT"
+        });
+
+        showToast("Order cancelled.", "success");
+
+        const placeOrderResultHasIt =
+            document.getElementById("ordPlaceOrderResult").innerHTML.includes(orderCode);
+
+        renderOrderList(
+            [data],
+            placeOrderResultHasIt
+                ? document.getElementById("ordPlaceOrderResult")
+                : document.getElementById("ordListContainer")
+        );
+
+    } catch (error) {
+        showToast(error.message, "error");
+    }
+}
+
+// ============================================================
+// END ORDER SERVICE
+// ============================================================

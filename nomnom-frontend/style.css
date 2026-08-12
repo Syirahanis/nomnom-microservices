@@ -1600,3 +1600,87 @@ body {
     background: var(--green);
     color: var(--white);
 }
+
+/* ============================================================
+   ORDER SERVICE — item row layout (Place Order page)
+   ============================================================ */
+
+.ord-item-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.ord-item-row input {
+    flex: 1 1 160px;
+}
+
+.ord-item-row .ord-item-qty {
+    flex: 0 1 70px;
+}
+
+.ord-item-row .ord-item-price {
+    flex: 0 1 110px;
+}
+
+.ord-item-row .ord-item-remove {
+    flex: 0 0 auto;
+    padding: 0.5rem 0.85rem;
+}
+
+@media (max-width: 640px) {
+    .ord-item-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+
+/* ============================================================
+   ORDER SERVICE — input/button colour fix
+   Same fix Restaurant Service applied: shared .lookup-field /
+   .secondary-button styles assume a dark card background.
+   ============================================================ */
+
+#ordLookupBar .lookup-field input,
+#ordCustomerLookupBar .lookup-field input {
+    color: var(--green);
+    background: #f4f7f5;
+    border-color: #c8d8d2;
+}
+
+#ordLookupBar .lookup-field input::placeholder,
+#ordCustomerLookupBar .lookup-field input::placeholder {
+    color: #8fa89f;
+}
+
+#ordLookupBar .lookup-field label,
+#ordCustomerLookupBar .lookup-field label {
+    color: #4a6b5e;
+}
+
+#ordLookupOrderButton,
+#ordLoadCustomerOrdersButton,
+#ordLoadAllButton,
+#ordAddItemButton {
+    color: var(--green);
+    background: transparent;
+    border: 2px solid var(--green);
+}
+
+#ordLookupOrderButton:hover,
+#ordLoadCustomerOrdersButton:hover,
+#ordLoadAllButton:hover,
+#ordAddItemButton:hover {
+    background: var(--green);
+    color: var(--white);
+}
+
+
+/* Status badge colour variants for order status */
+.ord-status-placed    { background: #f0ad4e; }
+.ord-status-confirmed { background: #5bc0de; }
+.ord-status-delivered { background: #5cb85c; }
+.ord-status-cancelled { background: #d9534f; }
