@@ -89,6 +89,18 @@ services:
       kafka:
         condition: service_healthy
 
+# Kafka UI - port 8088
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: nomnom-kafka-ui
+    ports:
+      - "8088:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on:
+      - kafka
+
   # Frontend - static htmlcssjs serv by nginx on port 5500
   frontend:
     build:
