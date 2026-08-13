@@ -36,6 +36,7 @@ services:
     environment:
       # Point Kafka at the broker container instead of localhost
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS: "true"
     depends_on:
       kafka:
         condition: service_healthy
@@ -50,6 +51,7 @@ services:
       - "8081:8081"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS: "true"
     depends_on:
       kafka:
         condition: service_healthy
@@ -64,6 +66,7 @@ services:
       - "8082:8082"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS: "true"
       CUSTOMER_SERVICE_BASE_URL: http://customer-service:8080
     depends_on:
       kafka:
@@ -81,6 +84,7 @@ services:
       - "8083:8083"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS: "true"
     depends_on:
       kafka:
         condition: service_healthy
